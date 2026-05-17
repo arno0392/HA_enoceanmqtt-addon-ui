@@ -1,8 +1,8 @@
 ---
-name: "EnOcean MQTT UI"
-version: "1.2.5"
+name: "EnOcean MQTT UI Fork"
+version: "1.3.0"
 slug: "enocean-mqtt-ui"
-description: "All-in-One EnOcean to MQTT bridge with web UI. Configure devices visually, create custom EEP profiles, and manage MQTT mappings - no config files needed!"
+description: "Fork All-in-One EnOcean to MQTT bridge with web UI. Configure devices visually, create custom EEP profiles, and manage MQTT mappings - no config files needed!"
 url: "https://github.com/ESDN83/HA_enoceanmqtt-addon-ui"
 arch:
   - aarch64
@@ -30,6 +30,10 @@ options:
   log_level: "info"
   cache_device_states: true
   mqtt:
+    mqtt_host: "core-mosquitto"
+    mqtt_port: 1883
+    mqtt_user: ""
+    mqtt_pwd: ""
     discovery_prefix: "homeassistant"
     prefix: "enoceanmqtt"
     client_id: "enocean_gateway"
@@ -40,6 +44,10 @@ schema:
   log_level: "list(debug|info|warning|error)"
   cache_device_states: "bool"
   mqtt:
+    mqtt_host: "str"
+    mqtt_port: "int"
+    mqtt_user: "str"
+    mqtt_pwd: "password"
     discovery_prefix: "str"
     prefix: "str"
     client_id: "str"
