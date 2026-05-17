@@ -1,5 +1,5 @@
 {
-  "name": "EnOcean MQTT UI Add-on Repository",
-  "url": "https://github.com/ESDN83/HA_enoceanmqtt-addon-ui",
-  "maintainer": "ESDN83"
+  "name": "Fork EnOcean MQTT UI Add-on Repository",
+  "url": "https://github.com/arno0392/HA_enoceanmqtt-addon-ui/",
+  "maintainer": "arno0392"
 }
