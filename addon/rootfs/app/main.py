@@ -6,6 +6,7 @@ Compatible with ChristopheHD/HA_enoceanmqtt-addon MQTT patterns.
 """
 
 import os
+import json
 import asyncio
 import logging
 from contextlib import asynccontextmanager
@@ -44,7 +45,42 @@ logger = logging.getLogger(__name__)
 CONFIG_PATH = os.getenv("CONFIG_PATH", "/data")
 ENOCEAN_PORT = os.getenv("ENOCEAN_PORT", "")
 CACHE_DEVICE_STATES = os.getenv("CACHE_DEVICE_STATES", "true").lower() == "true"
-VERSION = "1.2.5"
+VERSION = "1.3.0"
+
+# Path to HA Supervisor options file
+OPTIONS_FILE = "/data/options.json"
+
+
+def _load_mqtt_config() -> dict:
+    """Load MQTT configuration.
+
+    Priority order:
+      1. /data/options.json  → written by HA Supervisor AND by the UI save endpoint
+      2. Environment variables → set by the Supervisor from config.yaml at startup
+      3. Hardcoded defaults
+
+    This means values saved via the UI take effect immediately on the next
+    connect without requiring an addon restart.
+    """
+    opts: dict = {}
+    if os.path.exists(OPTIONS_FILE):
+        try:
+            with open(OPTIONS_FILE, "r") as f:
+                raw = json.load(f)
+            opts = raw.get("mqtt", {})
+        except Exception as e:
+            logger.warning(f"Could not read {OPTIONS_FILE}: {e}")
+
+    return {
+        "host":             opts.get("mqtt_host",        os.getenv("MQTT_HOST", "")),
+        "port":             int(opts.get("mqtt_port",    os.getenv("MQTT_PORT", "1883"))),
+        "user":             opts.get("mqtt_user",        os.getenv("MQTT_USER", "")),
+        "password":         opts.get("mqtt_pwd",         os.getenv("MQTT_PASSWORD", "")),
+        "prefix":           opts.get("prefix",           os.getenv("MQTT_PREFIX", "enoceanmqtt")),
+        "discovery_prefix": opts.get("discovery_prefix", os.getenv("MQTT_DISCOVERY_PREFIX", "homeassistant")),
+        "client_id":        opts.get("client_id",        os.getenv("MQTT_CLIENT_ID", "enocean_gateway")),
+    }
+
 
 # Global instances
 mqtt_handler: MQTTHandler = None
@@ -79,28 +115,23 @@ async def lifespan(app: FastAPI):
     await device_manager.load_devices()
     logger.info(f"Loaded {device_manager.device_count} devices")
 
-    # Initialize MQTT Handler
-    mqtt_host = os.getenv("MQTT_HOST", "")
-    mqtt_port = int(os.getenv("MQTT_PORT", "1883"))
-    mqtt_user = os.getenv("MQTT_USER", "")
-    mqtt_password = os.getenv("MQTT_PASSWORD", "")
-    mqtt_prefix = os.getenv("MQTT_PREFIX", "enoceanmqtt")
-    mqtt_discovery_prefix = os.getenv("MQTT_DISCOVERY_PREFIX", "homeassistant")
+    # Initialize MQTT Handler — read config from options.json / env vars
+    mqtt_cfg = _load_mqtt_config()
 
-    if mqtt_host:
+    if mqtt_cfg["host"]:
         mqtt_handler = MQTTHandler(
-            host=mqtt_host,
-            port=mqtt_port,
-            username=mqtt_user,
-            password=mqtt_password,
-            prefix=mqtt_prefix,
-            discovery_prefix=mqtt_discovery_prefix,
+            host=mqtt_cfg["host"],
+            port=mqtt_cfg["port"],
+            username=mqtt_cfg["user"],
+            password=mqtt_cfg["password"],
+            prefix=mqtt_cfg["prefix"],
+            discovery_prefix=mqtt_cfg["discovery_prefix"],
             device_manager=device_manager,
             config_path=CONFIG_PATH,
             cache_states=CACHE_DEVICE_STATES
         )
         await mqtt_handler.connect()
-        logger.info(f"Connected to MQTT broker at {mqtt_host}:{mqtt_port}")
+        logger.info(f"Connected to MQTT broker at {mqtt_cfg['host']}:{mqtt_cfg['port']}")
 
         # Load persisted states into memory (published AFTER discoveries below)
         if CACHE_DEVICE_STATES:
@@ -211,10 +242,8 @@ async def _publish_all_discoveries():
 
     for device in device_manager.devices.values():
         try:
-            # Build device info for HA
             device_info = mapping_manager.build_device_info(device)
 
-            # Generate discovery configs
             configs = mapping_manager.get_ha_discovery_configs(
                 device_name=device.name,
                 eep_id=device.eep_id,
@@ -225,7 +254,6 @@ async def _publish_all_discoveries():
                 actuator_type=device.actuator_type
             )
 
-            # Publish each entity discovery config
             for item in configs:
                 await mqtt_handler.publish_discovery_config(
                     component=item["component"],
@@ -233,7 +261,6 @@ async def _publish_all_discoveries():
                     config=item["config"]
                 )
 
-            # Publish device availability (online)
             await mqtt_handler.publish_device_availability(device.name, available=True)
 
             logger.debug(f"Published discovery for {device.name}")
@@ -243,20 +270,13 @@ async def _publish_all_discoveries():
 
     logger.info(f"Published HA discovery for {device_manager.device_count} devices")
 
-    # Re-publish cached states AFTER all discoveries are sent
-    # Give HA time to process discovery configs before sending states
     if mqtt_handler.cache_states:
         await asyncio.sleep(2)
         await mqtt_handler.republish_cached_states()
 
 
 async def _handle_device_command(device_name: str, payload: str, entity: str = None):
-    """Handle MQTT command for an actuator device — send F6 telegram.
-
-    For Eltako actuators (FD62NPN, FSR61, FSB61, etc.):
-    - ON: F6 rocker B top (BI) press + release
-    - OFF: F6 rocker B bottom (B0) press + release
-    """
+    """Handle MQTT command for an actuator device — send F6 telegram."""
     global serial_handler, device_manager
 
     if not serial_handler or not serial_handler.is_connected:
@@ -279,7 +299,6 @@ async def _handle_device_command(device_name: str, payload: str, entity: str = N
         logger.warning(f"Cannot send command for {device_name}: no sender_id configured")
         return
 
-    # Parse sender ID to integer
     try:
         sender_id = int(device.sender_id.replace("0x", "").replace("0X", ""), 16)
         destination = int(device.address.replace("0x", "").replace("0X", ""), 16)
@@ -290,24 +309,16 @@ async def _handle_device_command(device_name: str, payload: str, entity: str = N
     command = payload.strip().upper()
     logger.info(f"Actuator command: {device_name} ({device.actuator_type}) = {command}")
 
-    # F6 rocker commands use BROADCAST like real EnOcean pushbuttons.
-    # Eltako actuators match by sender ID, not by destination address.
     broadcast = 0xFFFFFFFF
 
     if device.actuator_type == "light":
-        # Dimmers use A5-38-08 Central Command Dimming
-        # With on_command_type=brightness, HA sends brightness (0-100) for ON,
-        # "OFF" for off. "ON" text only from manual MQTT publish.
         if command == "ON":
-            # Turn on at stored brightness (dim_mode=0)
             await serial_handler.send_a5_dimmer_command(sender_id, "ON")
             logger.info(f"Sent ON (A5-38-08 stored brightness) to {device_name}")
         elif command == "OFF":
             await serial_handler.send_a5_dimmer_command(sender_id, "OFF")
             logger.info(f"Sent OFF (A5-38-08) to {device_name}")
         else:
-            # Brightness value from HA (0-100) — send as 0-100 directly
-            # Eltako dimmers use 0-100 range (not standard 0-255)
             try:
                 val = int(command)
                 dim = max(0, min(100, val))
@@ -315,7 +326,6 @@ async def _handle_device_command(device_name: str, payload: str, entity: str = N
                     await serial_handler.send_a5_dimmer_command(sender_id, "OFF")
                     logger.info(f"Sent OFF (A5-38-08 brightness=0) to {device_name}")
                 else:
-                    # DIM mode: dim_mode=1 (use DB2 value) — actually sets brightness
                     await serial_handler.send_a5_dimmer_command(sender_id, "DIM", dim_value=dim)
                     logger.info(f"Sent DIM (A5-38-08 dim={dim}, {val}%) to {device_name}")
             except ValueError:
@@ -323,13 +333,11 @@ async def _handle_device_command(device_name: str, payload: str, entity: str = N
 
     elif device.actuator_type == "switch":
         if command == "ON":
-            # F6 Rocker B top (BI) pressed: data=0x50, status=0x30 (T21+NU)
             await serial_handler.send_telegram(
                 sender_id=sender_id, rorg=0xF6,
                 data=bytes([0x50]), destination=broadcast, status=0x30
             )
             await asyncio.sleep(0.1)
-            # Release: data=0x00, status=0x20 (T21, no NU)
             await serial_handler.send_telegram(
                 sender_id=sender_id, rorg=0xF6,
                 data=bytes([0x00]), destination=broadcast, status=0x20
@@ -337,13 +345,11 @@ async def _handle_device_command(device_name: str, payload: str, entity: str = N
             logger.info(f"Sent ON (F6 BI press+release) to {device_name}")
 
         elif command == "OFF":
-            # F6 Rocker B bottom (B0) pressed: data=0x70, status=0x30 (T21+NU)
             await serial_handler.send_telegram(
                 sender_id=sender_id, rorg=0xF6,
                 data=bytes([0x70]), destination=broadcast, status=0x30
             )
             await asyncio.sleep(0.1)
-            # Release: data=0x00, status=0x20 (T21, no NU)
             await serial_handler.send_telegram(
                 sender_id=sender_id, rorg=0xF6,
                 data=bytes([0x00]), destination=broadcast, status=0x20
@@ -355,7 +361,6 @@ async def _handle_device_command(device_name: str, payload: str, entity: str = N
 
     elif device.actuator_type == "cover":
         if command == "OPEN":
-            # BI press+release for open/up
             await serial_handler.send_telegram(
                 sender_id=sender_id, rorg=0xF6,
                 data=bytes([0x50]), destination=broadcast, status=0x30
@@ -366,7 +371,6 @@ async def _handle_device_command(device_name: str, payload: str, entity: str = N
                 data=bytes([0x00]), destination=broadcast, status=0x20
             )
         elif command == "CLOSE":
-            # B0 press+release for close/down
             await serial_handler.send_telegram(
                 sender_id=sender_id, rorg=0xF6,
                 data=bytes([0x70]), destination=broadcast, status=0x30
@@ -377,7 +381,6 @@ async def _handle_device_command(device_name: str, payload: str, entity: str = N
                 data=bytes([0x00]), destination=broadcast, status=0x20
             )
         elif command == "STOP":
-            # Any release without prior press = stop
             await serial_handler.send_telegram(
                 sender_id=sender_id, rorg=0xF6,
                 data=bytes([0x00]), destination=broadcast, status=0x20
@@ -429,9 +432,6 @@ async def health():
 
 if __name__ == "__main__":
     import uvicorn
-    # Suppress uvicorn's own startup messages ("Uvicorn running on http://0.0.0.0:8099",
-    # "Application startup complete") which confuse users.
-    # Our own "started successfully" message in the lifespan is clearer.
     uvicorn.run(
         app,
         host="0.0.0.0",
