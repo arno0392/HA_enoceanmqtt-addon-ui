@@ -372,6 +372,12 @@
                         <i class="bi bi-plus-circle"></i> <span data-i18n="nav.add_device">Add Device</span>
                     </a>
                 </li>
+                <!-- ★ NEW: MQTT Broker page -->
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="mqtt-broker">
+                        <i class="bi bi-server"></i> <span data-i18n="nav.mqtt_broker">MQTT Broker</span>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" data-page="settings">
                         <i class="bi bi-gear"></i> <span data-i18n="nav.settings">Settings</span>
@@ -398,6 +404,7 @@
                             <h6 class="card-subtitle mb-2 text-muted" data-i18n="dashboard.mqtt_broker">MQTT Broker</h6>
                             <h4 class="card-title" id="mqtt-host">-</h4>
                             <span class="badge bg-secondary" id="mqtt-connection" data-i18n="status.checking">Checking...</span>
+                            <a href="#" class="ms-2 small" onclick="navigateTo('mqtt-broker')" data-i18n="dashboard.configure">Configure</a>
                         </div>
                     </div>
                 </div>
@@ -773,6 +780,101 @@
             </div>
         </div>
 
+        <!-- ★ NEW: MQTT Broker Configuration Page -->
+        <div id="page-mqtt-broker" class="page-content" style="display: none;">
+            <h2 class="mb-4"><i class="bi bi-server me-2"></i><span data-i18n="mqtt.title">MQTT Broker</span></h2>
+
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-7">
+                    <div class="card shadow-sm">
+                        <div class="card-header d-flex align-items-center gap-2">
+                            <i class="bi bi-hdd-network fs-5"></i>
+                            <span class="fw-semibold" data-i18n="mqtt.card_title">Broker Configuration</span>
+                            <span id="mqtt-broker-badge" class="badge ms-auto bg-secondary">…</span>
+                        </div>
+                        <div class="card-body">
+
+                            <!-- Alert result -->
+                            <div id="mqtt-broker-alert" class="alert d-none mb-3" role="alert"></div>
+
+                            <div class="mb-3">
+                                <label for="mqttb-host" class="form-label">
+                                    <span data-i18n="mqtt.host">Hôte / URL</span> <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="mqttb-host"
+                                       placeholder="core-mosquitto  ou  192.168.1.x">
+                                <div class="form-text">
+                                    <span data-i18n="mqtt.host_hint">Utilisez</span>
+                                    <code>core-mosquitto</code>
+                                    <span data-i18n="mqtt.host_hint2">pour le broker Mosquitto intégré à HA.</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="mqttb-port" class="form-label" data-i18n="mqtt.port">Port</label>
+                                <input type="number" class="form-control" id="mqttb-port"
+                                       placeholder="1883" min="1" max="65535">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="mqttb-user" class="form-label" data-i18n="mqtt.user">Nom d'utilisateur</label>
+                                <input type="text" class="form-control" id="mqttb-user"
+                                       placeholder="(optionnel)" autocomplete="off">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="mqttb-pwd" class="form-label" data-i18n="mqtt.password">Mot de passe</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="mqttb-pwd"
+                                           placeholder="(laisser vide pour conserver l'actuel)"
+                                           autocomplete="new-password">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                            id="mqttb-pwd-toggle" title="Afficher/masquer">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text" data-i18n="mqtt.password_hint">Laissez vide pour conserver le mot de passe enregistré.</div>
+                            </div>
+
+                            <hr class="my-3">
+                            <p class="text-muted small mb-2" data-i18n="mqtt.advanced">Options avancées</p>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6">
+                                    <label for="mqttb-prefix" class="form-label" data-i18n="mqtt.prefix">Préfixe MQTT</label>
+                                    <input type="text" class="form-control" id="mqttb-prefix"
+                                           placeholder="enoceanmqtt">
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="mqttb-discovery" class="form-label" data-i18n="mqtt.discovery_prefix">Préfixe discovery</label>
+                                    <input type="text" class="form-control" id="mqttb-discovery"
+                                           placeholder="homeassistant">
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="mqttb-client-id" class="form-label" data-i18n="mqtt.client_id">Client ID</label>
+                                <input type="text" class="form-control" id="mqttb-client-id"
+                                       placeholder="enocean_gateway">
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary" id="mqttb-save-btn" onclick="mqttBrokerSave()">
+                                    <i class="bi bi-save me-1"></i>
+                                    <span data-i18n="mqtt.save">Enregistrer &amp; Reconnecter</span>
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="mqttBrokerLoad()">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>
+                                    <span data-i18n="mqtt.refresh">Actualiser</span>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Settings Page -->
         <div id="page-settings" class="page-content" style="display: none;">
             <h2 class="mb-4" data-i18n="settings.title">Settings</h2>
@@ -1017,19 +1119,11 @@
 
         // API base URL - handles HA Ingress path
         function getApiUrl(path) {
-            // Get base path from current URL (for HA Ingress)
-            // pathname could be "/" or "/api/hassio_ingress/<token>/" etc
             let basePath = window.location.pathname;
-
-            // Remove trailing slash
             basePath = basePath.replace(/\/$/, '');
-
-            // If we're at root or basePath already contains /api/, don't prepend
             if (basePath === '' || basePath === '/') {
                 return path;
             }
-
-            // For HA Ingress: basePath will be like /api/hassio_ingress/abc123
             return basePath + path;
         }
 
@@ -1045,7 +1139,6 @@
         function detectAndApplyTheme() {
             let dark = false;
 
-            // Method 1: Check HA Ingress — HA sets body background via inline style
             try {
                 const parentDoc = window.parent.document;
                 const haTheme = parentDoc.querySelector('html')?.getAttribute('data-theme') ||
@@ -1053,24 +1146,17 @@
                 if (haTheme.toLowerCase().includes('dark')) {
                     dark = true;
                 }
-                // Also check computed style of HA body background
                 if (!dark) {
                     const bgColor = getComputedStyle(parentDoc.body).backgroundColor;
-                    // Parse rgb(r,g,b) — if average < 128 it's dark
                     const m = bgColor.match(/\d+/g);
                     if (m && m.length >= 3) {
                         const avg = (parseInt(m[0]) + parseInt(m[1]) + parseInt(m[2])) / 3;
                         if (avg < 128) dark = true;
                     }
                 }
-
-                // Try to inherit HA's CSS custom properties for exact theme matching
                 applyHAThemeVars(parentDoc);
-            } catch (e) {
-                // Cross-origin — not in HA Ingress, fall through
-            }
+            } catch (e) {}
 
-            // Method 2: prefers-color-scheme media query (standalone browser)
             if (!dark && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 dark = true;
             }
@@ -1080,7 +1166,6 @@
         }
 
         function applyHAThemeVars(parentDoc) {
-            // Map HA CSS variables to our variables for seamless theme integration
             const haRoot = parentDoc.documentElement;
             const style = getComputedStyle(haRoot);
             const mapping = {
@@ -1100,17 +1185,13 @@
             }
         }
 
-        // Listen for OS theme changes (standalone mode)
         if (window.matchMedia) {
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', detectAndApplyTheme);
         }
-
-        // Apply theme immediately (before DOMContentLoaded to prevent flash)
         detectAndApplyTheme();
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            // Re-check theme after full load (HA Ingress may set theme late)
             setTimeout(detectAndApplyTheme, 500);
 
             // Navigation
@@ -1127,9 +1208,9 @@
                 loadRecentTelegrams();
                 loadUnknownDevices();
             });
-            setInterval(loadStatus, 10000); // Refresh every 10 seconds
-            setInterval(loadRecentTelegrams, 5000); // Refresh telegrams every 5 seconds
-            setInterval(loadUnknownDevices, 15000); // Refresh unknown devices every 15 seconds
+            setInterval(loadStatus, 10000);
+            setInterval(loadRecentTelegrams, 5000);
+            setInterval(loadUnknownDevices, 15000);
 
             // Device form
             document.getElementById('device-form').addEventListener('submit', saveDevice);
@@ -1144,11 +1225,22 @@
                 form.reset();
                 delete form.dataset.editEepId;
                 document.querySelector('#customProfileModal .modal-title').textContent = t('modal.custom_profile_title', 'Create Custom EEP Profile');
-                // Clear HA mapping builder
                 document.getElementById('ha-mapping-rows').innerHTML = '';
                 document.getElementById('ha-mapping-empty').style.display = '';
-                // Reset text mode when modal closes
                 _resetHaTextMode();
+            });
+
+            // ★ MQTT Broker page: password toggle
+            document.getElementById('mqttb-pwd-toggle').addEventListener('click', () => {
+                const inp = document.getElementById('mqttb-pwd');
+                const icon = document.getElementById('mqttb-pwd-toggle').querySelector('i');
+                if (inp.type === 'password') {
+                    inp.type = 'text';
+                    icon.className = 'bi bi-eye-slash';
+                } else {
+                    inp.type = 'password';
+                    icon.className = 'bi bi-eye';
+                }
             });
         });
 
@@ -1167,26 +1259,18 @@
         }
 
         function navigateTo(page) {
-            // Hide all pages
             document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
-            // Show selected page
             document.getElementById('page-' + page).style.display = 'block';
-            // Update nav
             document.querySelectorAll('[data-page]').forEach(link => {
                 link.classList.toggle('active', link.dataset.page === page);
             });
             currentPage = page;
-
-            // Close sidebar on mobile after navigation
             closeSidebar();
 
-            // Reset teach-in state when leaving the page
             if (page !== 'teach-in') {
                 cancelTeachIn();
                 document.getElementById('actuator-teach-in-panel').style.display = 'none';
             }
-
-            // Clear search fields when navigating away
             if (page !== 'devices') {
                 const ds = document.getElementById('device-search');
                 if (ds) ds.value = '';
@@ -1196,19 +1280,128 @@
                 if (ps) ps.value = '';
             }
 
-            // Load page-specific data
             if (page === 'devices') loadDevices();
             if (page === 'profiles') loadProfiles();
             if (page === 'settings') { loadBackups(); loadEepInfo(); }
             if (page === 'teach-in') resetTeachInPage();
+            // ★ Load MQTT config when navigating to the broker page
+            if (page === 'mqtt-broker') mqttBrokerLoad();
         }
+
+        // ═══════════════════════════════════════════════════════
+        // ★ MQTT Broker page logic
+        // ═══════════════════════════════════════════════════════
+
+        function _mqttBrokerShowAlert(msg, type = 'success') {
+            const el = document.getElementById('mqtt-broker-alert');
+            el.className = `alert alert-${type}`;
+            el.textContent = msg;
+            el.classList.remove('d-none');
+            setTimeout(() => el.classList.add('d-none'), 4000);
+        }
+
+        function _mqttBrokerSetBadge(connected) {
+            const b = document.getElementById('mqtt-broker-badge');
+            if (connected === null) {
+                b.className = 'badge ms-auto bg-secondary'; b.textContent = '…';
+            } else if (connected) {
+                b.className = 'badge ms-auto bg-success'; b.textContent = t('status.connected', 'Connecté');
+            } else {
+                b.className = 'badge ms-auto bg-danger'; b.textContent = t('status.disconnected', 'Déconnecté');
+            }
+        }
+
+        async function mqttBrokerLoad() {
+            _mqttBrokerSetBadge(null);
+            try {
+                const r = await fetch(getApiUrl('/api/system/mqtt-config'));
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                const d = await r.json();
+
+                document.getElementById('mqttb-host').value      = d.mqtt_host        ?? '';
+                document.getElementById('mqttb-port').value      = d.mqtt_port        ?? 1883;
+                document.getElementById('mqttb-user').value      = d.mqtt_user        ?? '';
+                document.getElementById('mqttb-pwd').value       = '';  // never pre-fill
+                document.getElementById('mqttb-prefix').value    = d.prefix           ?? 'enoceanmqtt';
+                document.getElementById('mqttb-discovery').value = d.discovery_prefix ?? 'homeassistant';
+                document.getElementById('mqttb-client-id').value = d.client_id        ?? 'enocean_gateway';
+
+                document.getElementById('mqttb-pwd').placeholder = d.mqtt_pwd_set
+                    ? t('mqtt.pwd_set', '(mot de passe enregistré — laisser vide pour conserver)')
+                    : t('mqtt.pwd_empty', '(aucun mot de passe enregistré)');
+            } catch (e) {
+                _mqttBrokerShowAlert(t('mqtt.load_failed', 'Impossible de charger la configuration : ') + e.message, 'danger');
+            }
+
+            // Refresh connection badge from /health
+            try {
+                const h = await fetch(getApiUrl('/health'));
+                const hd = await h.json();
+                _mqttBrokerSetBadge(hd.mqtt_connected === true);
+            } catch { _mqttBrokerSetBadge(false); }
+        }
+
+        async function mqttBrokerSave() {
+            const btn = document.getElementById('mqttb-save-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>' + t('mqtt.connecting', 'Connexion…');
+
+            const host = document.getElementById('mqttb-host').value.trim();
+            if (!host) {
+                _mqttBrokerShowAlert(t('mqtt.host_required', "L'hôte du broker est obligatoire."), 'warning');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-save me-1"></i>' + t('mqtt.save', 'Enregistrer & Reconnecter');
+                return;
+            }
+
+            const payload = {
+                mqtt_host:        host,
+                mqtt_port:        parseInt(document.getElementById('mqttb-port').value, 10) || 1883,
+                mqtt_user:        document.getElementById('mqttb-user').value.trim(),
+                mqtt_pwd:         document.getElementById('mqttb-pwd').value,
+                prefix:           document.getElementById('mqttb-prefix').value.trim()    || 'enoceanmqtt',
+                discovery_prefix: document.getElementById('mqttb-discovery').value.trim() || 'homeassistant',
+                client_id:        document.getElementById('mqttb-client-id').value.trim() || 'enocean_gateway',
+            };
+
+            try {
+                const r = await fetch(getApiUrl('/api/system/mqtt-config'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                const d = await r.json();
+
+                if (!r.ok) {
+                    _mqttBrokerShowAlert(d.detail ?? t('mqtt.save_failed', 'Erreur lors de la sauvegarde.'), 'danger');
+                    _mqttBrokerSetBadge(false);
+                } else {
+                    _mqttBrokerShowAlert(
+                        d.reconnected
+                            ? t('mqtt.save_ok', 'Configuration sauvegardée et broker reconnecté.')
+                            : t('mqtt.save_no_handler', 'Configuration sauvegardée (pas de handler MQTT actif).'),
+                        'success'
+                    );
+                    await mqttBrokerLoad();
+                    loadStatus(); // refresh navbar badges
+                }
+            } catch (e) {
+                _mqttBrokerShowAlert(t('mqtt.network_error', 'Erreur réseau : ') + e.message, 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-save me-1"></i>' + t('mqtt.save', 'Enregistrer & Reconnecter');
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // Rest of existing code (unchanged)
+        // ═══════════════════════════════════════════════════════
 
         async function loadStatus() {
             try {
                 const response = await fetch(getApiUrl('/api/system/status'));
                 const data = await response.json();
 
-                // Update MQTT status
                 const mqttBadge = document.getElementById('mqtt-status');
                 const mqttConn = document.getElementById('mqtt-connection');
                 const mqttCard = document.getElementById('card-mqtt');
@@ -1229,7 +1422,6 @@
                 }
                 document.getElementById('mqtt-host').textContent = data.mqtt.host || t('status.not_configured', 'Not configured');
 
-                // Update EnOcean status
                 const enoceanBadge = document.getElementById('enocean-status');
                 const enoceanConn = document.getElementById('enocean-connection');
                 const enoceanCard = document.getElementById('card-enocean');
@@ -1250,7 +1442,6 @@
                 }
                 document.getElementById('enocean-port').textContent = data.enocean.port || t('status.not_configured', 'Not configured');
 
-                // Update counts
                 document.getElementById('device-count').textContent = data.devices.count;
                 document.getElementById('profile-count').textContent = data.profiles.count;
 
@@ -1275,7 +1466,6 @@
                 devices.forEach(device => {
                     const card = document.createElement('div');
                     card.className = 'col-md-4 mb-3';
-                    // Build searchable text from device properties only (not button text)
                     const searchText = [device.name, device.address, `${device.rorg}-${device.func}-${device.type}`,
                         device.actuator_type, device.room, device.description, device.sender_id
                     ].filter(Boolean).join(' ').toLowerCase();
@@ -1310,7 +1500,6 @@
                     container.appendChild(card);
                 });
 
-                // Re-apply search filter if query is active
                 const searchQuery = document.getElementById('device-search').value;
                 if (searchQuery) filterDevices();
             } catch (error) {
@@ -1323,7 +1512,6 @@
                 const response = await fetch(getApiUrl('/api/eep/tree'));
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error('EEP tree API error:', response.status, errorText);
                     throw new Error(`HTTP ${response.status}: ${errorText}`);
                 }
                 const treeResponse = await response.json();
@@ -1333,23 +1521,18 @@
                 const container = document.getElementById('eep-tree');
                 container.innerHTML = '';
 
-                // Collect custom profiles and overridden profiles for separate sections
                 const customProfiles = [];
                 const overriddenProfiles = [];
 
                 for (const [rorg, rorgData] of Object.entries(tree)) {
                     for (const [func, funcData] of Object.entries(rorgData.funcs)) {
                         for (const [type, typeData] of Object.entries(funcData.types)) {
-                            if (typeData.is_custom) {
-                                customProfiles.push(typeData);
-                            } else if (typeData.has_mapping_override) {
-                                overriddenProfiles.push(typeData);
-                            }
+                            if (typeData.is_custom) customProfiles.push(typeData);
+                            else if (typeData.has_mapping_override) overriddenProfiles.push(typeData);
                         }
                     }
                 }
 
-                // Show custom profiles section first (always expanded)
                 if (customProfiles.length > 0) {
                     const customSection = document.createElement('div');
                     customSection.className = 'mb-3 border-start border-warning border-3 ps-2';
@@ -1366,7 +1549,6 @@
                     container.appendChild(customSection);
                 }
 
-                // Show overridden profiles section (always expanded)
                 if (overriddenProfiles.length > 0) {
                     const overriddenSection = document.createElement('div');
                     overriddenSection.className = 'mb-3 border-start border-success border-3 ps-2';
@@ -1383,7 +1565,6 @@
                     container.appendChild(overriddenSection);
                 }
 
-                // Show orphaned overrides warning (mappings for profiles that no longer exist)
                 if (orphanedOverrides.length > 0) {
                     const orphanedSection = document.createElement('div');
                     orphanedSection.className = 'mb-3 border-start border-danger border-3 ps-2';
@@ -1399,7 +1580,6 @@
                     container.appendChild(orphanedSection);
                 }
 
-                // Standard profiles (collapsed by default)
                 for (const [rorg, rorgData] of Object.entries(tree)) {
                     const rorgId = `rorg-${rorg}`;
                     const rorgDiv = document.createElement('div');
@@ -1413,7 +1593,7 @@
 
                     const rorgContent = document.createElement('div');
                     rorgContent.id = rorgId;
-                    rorgContent.style.display = 'none'; // collapsed by default
+                    rorgContent.style.display = 'none';
 
                     for (const [func, funcData] of Object.entries(rorgData.funcs)) {
                         const funcId = `func-${rorg}-${func}`;
@@ -1428,14 +1608,13 @@
 
                         const funcContent = document.createElement('div');
                         funcContent.id = funcId;
-                        funcContent.style.display = 'none'; // collapsed by default
+                        funcContent.style.display = 'none';
 
                         for (const [type, typeData] of Object.entries(funcData.types)) {
                             const typeDiv = document.createElement('div');
                             const itemClass = typeData.is_custom ? 'custom' : typeData.has_mapping_override ? 'overridden' : '';
                             typeDiv.className = `ms-4 eep-item ${itemClass}`;
                             typeDiv.style.cursor = 'pointer';
-                            // Include RORG + FUNC + TYPE descriptions for broader search matches
                             typeDiv.dataset.search = `${rorg} ${rorgData.description} ${func} ${funcData.description || ''} ${typeData.eep_id} ${typeData.description}`.toLowerCase();
                             const icon = typeData.is_custom ? 'bi-file-earmark-fill text-warning' : typeData.has_mapping_override ? 'bi-file-earmark-check text-success' : 'bi-file-earmark';
                             typeDiv.innerHTML = `<i class="bi ${icon}"></i> ${typeData.eep_id} - ${typeData.description}`;
@@ -1451,10 +1630,7 @@
                     container.appendChild(rorgDiv);
                 }
 
-                // Re-apply translations for dynamically created elements
                 applyTranslations();
-
-                // Re-apply search filter if query is active
                 const searchQuery = document.getElementById('profile-search').value;
                 if (searchQuery) filterProfiles();
             } catch (error) {
@@ -1468,9 +1644,7 @@
             if (node) {
                 const isHidden = node.style.display === 'none';
                 node.style.display = isHidden ? '' : 'none';
-                if (icon) {
-                    icon.className = isHidden ? 'bi bi-folder2-open' : 'bi bi-folder';
-                }
+                if (icon) icon.className = isHidden ? 'bi bi-folder2-open' : 'bi bi-folder';
             }
         }
 
@@ -1500,12 +1674,10 @@
                         </div>`;
                 }
 
-                // Determine effective mapping: override > ha_mapping > none
                 const effectiveMapping = profile.mapping_override || profile.ha_mapping || {};
                 const hasOverride = profile.has_mapping_override === true;
                 const hasMapping = Object.keys(effectiveMapping).length > 0;
 
-                // Build HA mapping display
                 let haMappingHtml = '<hr>';
                 haMappingHtml += `<div class="d-flex justify-content-between align-items-center mb-2">
                     <h6 class="mb-0"><i class="bi bi-house-gear"></i> ${t('mapping_editor.ha_mapping', 'HA Entity Mapping')}
@@ -1528,14 +1700,12 @@
                         if (config.device_class) mainFields.push(`${t('label.class', 'Class')}: ${config.device_class}`);
                         if (config.icon) mainFields.push(`${t('label.icon', 'Icon')}: ${config.icon}`);
                         if (config.unit_of_measurement) mainFields.push(`${t('label.unit', 'Unit')}: ${config.unit_of_measurement}`);
-
                         const advancedFields = [];
                         if (config.state_class) advancedFields.push(`${t('label.state', 'State')}: ${config.state_class}`);
                         if (config.entity_category) advancedFields.push(`${t('label.category', 'Category')}: ${config.entity_category}`);
                         if (config.expire_after) advancedFields.push(`${t('label.expire', 'Expire')}: ${config.expire_after}s`);
                         if (config.force_update) advancedFields.push(t('label.force_update', 'Force Update'));
                         if (config.suggested_display_precision != null) advancedFields.push(`${t('label.precision', 'Precision')}: ${config.suggested_display_precision}`);
-
                         return `<div class="border rounded p-2 mb-2 bg-body-secondary">
                             <div class="d-flex justify-content-between">
                                 <strong>${shortcut}</strong>
@@ -1549,7 +1719,6 @@
                     haMappingHtml += `<p class="text-muted small"><i class="bi bi-info-circle"></i> ${t('mapping_editor.no_mapping', 'No HA mapping defined. Click "Customize" to create one.')}</p>`;
                 }
 
-                // Inline mapping editor (hidden by default)
                 haMappingHtml += `
                 <div id="inline-mapping-editor" style="display:none;" class="mt-3 border rounded p-3 bg-body-tertiary">
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -1605,7 +1774,6 @@
             }
         }
 
-        // Store current profile data for inline editor
         let _currentEditorProfile = null;
 
         async function openMappingEditor(eepId) {
@@ -1613,32 +1781,24 @@
                 const resp = await fetch(getApiUrl(`/api/eep/${eepId}/mapping`));
                 const data = await resp.json();
                 _currentEditorProfile = data;
-
-                // Reset text mode state when opening editor
                 _resetInlineTextMode();
-
                 const editor = document.getElementById('inline-mapping-editor');
                 const container = document.getElementById('inline-mapping-rows');
                 const emptyMsg = document.getElementById('inline-mapping-empty');
                 container.innerHTML = '';
-
                 const mapping = data.mapping || {};
                 if (Object.keys(mapping).length > 0) {
                     emptyMsg.style.display = 'none';
                     for (const [shortcut, config] of Object.entries(mapping)) {
                         addInlineMappingRow(shortcut, config.component || 'sensor', config.name || '', config.device_class || '', config.icon || '', config.unit_of_measurement || '', {
-                            state_class: config.state_class,
-                            entity_category: config.entity_category,
-                            expire_after: config.expire_after,
-                            force_update: config.force_update,
-                            suggested_display_precision: config.suggested_display_precision,
-                            value_template: config.value_template
+                            state_class: config.state_class, entity_category: config.entity_category,
+                            expire_after: config.expire_after, force_update: config.force_update,
+                            suggested_display_precision: config.suggested_display_precision, value_template: config.value_template
                         });
                     }
                 } else {
                     emptyMsg.style.display = '';
                 }
-
                 editor.style.display = '';
             } catch (e) {
                 showToast(t('toast.failed_load_mapping', 'Failed to load mapping'), 'danger');
@@ -1649,8 +1809,6 @@
             document.getElementById('inline-mapping-editor').style.display = 'none';
             _resetInlineTextMode();
         }
-
-        // ===== Text Mode Toggle (Visual ↔ YAML) =====
 
         let _inlineTextMode = false;
         let _haTextMode = false;
@@ -1682,34 +1840,19 @@
         }
 
         function toggleInlineMappingMode() {
-            if (!_isJsYamlAvailable()) {
-                showToast(t('toast.yaml_not_loaded', 'YAML library not loaded. Please reload the page.'), 'warning');
-                return;
-            }
+            if (!_isJsYamlAvailable()) { showToast(t('toast.yaml_not_loaded', 'YAML library not loaded. Please reload the page.'), 'warning'); return; }
             const visual = document.getElementById('inline-mapping-visual');
             const text = document.getElementById('inline-mapping-text');
             const btn = document.getElementById('inline-mode-toggle');
-
             if (!_inlineTextMode) {
-                // Visual → Text: collect mapping and serialize to YAML
                 const mapping = collectInlineMapping();
-                if (mapping === undefined) {
-                    showToast(t('toast.fix_validation', 'Fix validation errors before switching to text mode'), 'warning');
-                    return;
-                }
-                try {
-                    const yamlStr = (mapping && Object.keys(mapping).length > 0) ? jsyaml.dump(mapping, { lineWidth: -1 }) : '';
-                    document.getElementById('inline-mapping-yaml').value = yamlStr;
-                } catch (e) {
-                    showToast(t('toast.yaml_serialize_failed', 'Failed to serialize to YAML') + ': ' + e.message, 'danger');
-                    return;
-                }
-                visual.style.display = 'none';
-                text.style.display = '';
+                if (mapping === undefined) { showToast(t('toast.fix_validation', 'Fix validation errors before switching to text mode'), 'warning'); return; }
+                try { document.getElementById('inline-mapping-yaml').value = (mapping && Object.keys(mapping).length > 0) ? jsyaml.dump(mapping, { lineWidth: -1 }) : ''; }
+                catch (e) { showToast(t('toast.yaml_serialize_failed', 'Failed to serialize to YAML') + ': ' + e.message, 'danger'); return; }
+                visual.style.display = 'none'; text.style.display = '';
                 btn.innerHTML = `<i class="bi bi-ui-checks-grid"></i> ${t('mapping_editor.visual_mode', 'Visual Mode')}`;
                 _inlineTextMode = true;
             } else {
-                // Text → Visual: parse YAML and rebuild rows
                 const yamlStr = document.getElementById('inline-mapping-yaml').value.trim();
                 if (yamlStr) {
                     try {
@@ -1719,62 +1862,39 @@
                             container.innerHTML = '';
                             for (const [shortcut, config] of Object.entries(mapping)) {
                                 addInlineMappingRow(shortcut, config.component || 'sensor', config.name || '', config.device_class || '', config.icon || '', config.unit_of_measurement || '', {
-                                    state_class: config.state_class,
-                                    entity_category: config.entity_category,
-                                    expire_after: config.expire_after,
-                                    force_update: config.force_update,
-                                    suggested_display_precision: config.suggested_display_precision,
-                                    value_template: config.value_template
+                                    state_class: config.state_class, entity_category: config.entity_category,
+                                    expire_after: config.expire_after, force_update: config.force_update,
+                                    suggested_display_precision: config.suggested_display_precision, value_template: config.value_template
                                 });
                             }
                             document.getElementById('inline-mapping-empty').style.display = 'none';
                         }
-                    } catch (e) {
-                        showToast(t('toast.yaml_parse_error', 'YAML parse error') + ': ' + e.message, 'danger');
-                        return; // stay in text mode
-                    }
+                    } catch (e) { showToast(t('toast.yaml_parse_error', 'YAML parse error') + ': ' + e.message, 'danger'); return; }
                 } else {
                     document.getElementById('inline-mapping-rows').innerHTML = '';
                     document.getElementById('inline-mapping-empty').style.display = '';
                 }
-                visual.style.display = '';
-                text.style.display = 'none';
+                visual.style.display = ''; text.style.display = 'none';
                 btn.innerHTML = `<i class="bi bi-code-slash"></i> ${t('mapping_editor.text_mode', 'Text Mode')}`;
                 _inlineTextMode = false;
             }
         }
 
         function toggleHaMappingMode() {
-            if (!_isJsYamlAvailable()) {
-                showToast(t('toast.yaml_not_loaded', 'YAML library not loaded. Please reload the page.'), 'warning');
-                return;
-            }
+            if (!_isJsYamlAvailable()) { showToast(t('toast.yaml_not_loaded', 'YAML library not loaded. Please reload the page.'), 'warning'); return; }
             const visual = document.getElementById('ha-mapping-visual');
             const text = document.getElementById('ha-mapping-text');
             const btn = document.getElementById('ha-mode-toggle');
             const addBtn = document.getElementById('ha-add-row-btn');
-
             if (!_haTextMode) {
-                // Visual → Text
                 const mapping = collectHaMapping();
-                if (mapping === undefined) {
-                    showToast(t('toast.fix_validation', 'Fix validation errors before switching to text mode'), 'warning');
-                    return;
-                }
-                try {
-                    const yamlStr = (mapping && Object.keys(mapping).length > 0) ? jsyaml.dump(mapping, { lineWidth: -1 }) : '';
-                    document.getElementById('ha-mapping-yaml').value = yamlStr;
-                } catch (e) {
-                    showToast(t('toast.yaml_serialize_failed', 'Failed to serialize to YAML') + ': ' + e.message, 'danger');
-                    return;
-                }
-                visual.style.display = 'none';
-                text.style.display = '';
+                if (mapping === undefined) { showToast(t('toast.fix_validation', 'Fix validation errors before switching to text mode'), 'warning'); return; }
+                try { document.getElementById('ha-mapping-yaml').value = (mapping && Object.keys(mapping).length > 0) ? jsyaml.dump(mapping, { lineWidth: -1 }) : ''; }
+                catch (e) { showToast(t('toast.yaml_serialize_failed', 'Failed to serialize to YAML') + ': ' + e.message, 'danger'); return; }
+                visual.style.display = 'none'; text.style.display = '';
                 btn.innerHTML = `<i class="bi bi-ui-checks-grid"></i> ${t('mapping_editor.visual_mode', 'Visual Mode')}`;
-                addBtn.style.display = 'none';
-                _haTextMode = true;
+                addBtn.style.display = 'none'; _haTextMode = true;
             } else {
-                // Text → Visual
                 const yamlStr = document.getElementById('ha-mapping-yaml').value.trim();
                 if (yamlStr) {
                     try {
@@ -1784,68 +1904,42 @@
                             container.innerHTML = '';
                             for (const [shortcut, config] of Object.entries(mapping)) {
                                 addHaMappingRow(shortcut, config.component || 'binary_sensor', config.name || '', config.device_class || '', config.icon || '', config.unit_of_measurement || '', {
-                                    state_class: config.state_class,
-                                    entity_category: config.entity_category,
-                                    expire_after: config.expire_after,
-                                    force_update: config.force_update,
-                                    suggested_display_precision: config.suggested_display_precision,
-                                    value_template: config.value_template
+                                    state_class: config.state_class, entity_category: config.entity_category,
+                                    expire_after: config.expire_after, force_update: config.force_update,
+                                    suggested_display_precision: config.suggested_display_precision, value_template: config.value_template
                                 });
                             }
                             document.getElementById('ha-mapping-empty').style.display = 'none';
                         }
-                    } catch (e) {
-                        showToast(t('toast.yaml_parse_error', 'YAML parse error') + ': ' + e.message, 'danger');
-                        return; // stay in text mode
-                    }
+                    } catch (e) { showToast(t('toast.yaml_parse_error', 'YAML parse error') + ': ' + e.message, 'danger'); return; }
                 } else {
                     document.getElementById('ha-mapping-rows').innerHTML = '';
                     document.getElementById('ha-mapping-empty').style.display = '';
                 }
-                visual.style.display = '';
-                text.style.display = 'none';
+                visual.style.display = ''; text.style.display = 'none';
                 btn.innerHTML = `<i class="bi bi-code-slash"></i> ${t('mapping_editor.text_mode', 'Text Mode')}`;
-                addBtn.style.display = '';
-                _haTextMode = false;
+                addBtn.style.display = ''; _haTextMode = false;
             }
         }
 
         function getInlineMappingData() {
-            /** Get mapping data from either visual or text mode (inline editor) */
             if (_inlineTextMode) {
-                if (!_isJsYamlAvailable()) {
-                    showToast(t('toast.yaml_not_loaded', 'YAML library not loaded. Please reload the page.'), 'warning');
-                    return undefined;
-                }
+                if (!_isJsYamlAvailable()) { showToast(t('toast.yaml_not_loaded', 'YAML library not loaded.'), 'warning'); return undefined; }
                 const yamlStr = document.getElementById('inline-mapping-yaml').value.trim();
                 if (!yamlStr) return {};
-                try {
-                    const mapping = jsyaml.load(yamlStr);
-                    return (mapping && typeof mapping === 'object') ? mapping : {};
-                } catch (e) {
-                    showToast(t('toast.yaml_parse_error', 'YAML parse error') + ': ' + e.message, 'danger');
-                    return undefined; // signal error
-                }
+                try { const m = jsyaml.load(yamlStr); return (m && typeof m === 'object') ? m : {}; }
+                catch (e) { showToast(t('toast.yaml_parse_error', 'YAML parse error') + ': ' + e.message, 'danger'); return undefined; }
             }
             return collectInlineMapping();
         }
 
         function getHaMappingData() {
-            /** Get mapping data from either visual or text mode (HA mapping editor) */
             if (_haTextMode) {
-                if (!_isJsYamlAvailable()) {
-                    showToast(t('toast.yaml_not_loaded', 'YAML library not loaded. Please reload the page.'), 'warning');
-                    return undefined;
-                }
+                if (!_isJsYamlAvailable()) { showToast(t('toast.yaml_not_loaded', 'YAML library not loaded.'), 'warning'); return undefined; }
                 const yamlStr = document.getElementById('ha-mapping-yaml').value.trim();
                 if (!yamlStr) return null;
-                try {
-                    const mapping = jsyaml.load(yamlStr);
-                    return (mapping && typeof mapping === 'object' && Object.keys(mapping).length > 0) ? mapping : null;
-                } catch (e) {
-                    showToast(t('toast.yaml_parse_error', 'YAML parse error') + ': ' + e.message, 'danger');
-                    return undefined; // signal error
-                }
+                try { const m = jsyaml.load(yamlStr); return (m && typeof m === 'object' && Object.keys(m).length > 0) ? m : null; }
+                catch (e) { showToast(t('toast.yaml_parse_error', 'YAML parse error') + ': ' + e.message, 'danger'); return undefined; }
             }
             return collectHaMapping();
         }
@@ -1856,166 +1950,107 @@
             const container = document.getElementById('inline-mapping-rows');
             const emptyMsg = document.getElementById('inline-mapping-empty');
             if (emptyMsg) emptyMsg.style.display = 'none';
-
             const rowId = _inlineRowCounter++;
-            const stateClass = opts.state_class || '';
-            const entityCategory = opts.entity_category || '';
-            const expireAfter = opts.expire_after != null ? opts.expire_after : '';
-            const forceUpdate = opts.force_update || false;
-            const precision = opts.suggested_display_precision != null ? opts.suggested_display_precision : '';
-            const valueTemplate = opts.value_template || '';
-
+            const stateClass = opts.state_class || '', entityCategory = opts.entity_category || '',
+                  expireAfter = opts.expire_after != null ? opts.expire_after : '',
+                  forceUpdate = opts.force_update || false,
+                  precision = opts.suggested_display_precision != null ? opts.suggested_display_precision : '',
+                  valueTemplate = opts.value_template || '';
             const row = document.createElement('div');
             row.className = 'inline-mapping-row border rounded p-2 mb-2 bg-body-secondary';
             row.innerHTML = `
                 <div class="row g-2 align-items-end">
-                    <div class="col-md-2">
-                        <label class="form-label small">${t('mapping_editor.field_shortcut', 'Shortcut')}</label>
-                        <input type="text" class="form-control form-control-sm" placeholder="TMP" value="${shortcut}" data-field="shortcut">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small">${t('mapping_editor.field_component', 'Component')}</label>
+                    <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_shortcut', 'Shortcut')}</label>
+                        <input type="text" class="form-control form-control-sm" placeholder="TMP" value="${shortcut}" data-field="shortcut"></div>
+                    <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_component', 'Component')}</label>
                         <select class="form-select form-select-sm" data-field="component" onchange="onInlineComponentChange(this)">
-                            <option value="binary_sensor" ${component === 'binary_sensor' ? 'selected' : ''}>binary_sensor</option>
-                            <option value="sensor" ${component === 'sensor' ? 'selected' : ''}>sensor</option>
-                            <option value="switch" ${component === 'switch' ? 'selected' : ''}>switch</option>
-                            <option value="light" ${component === 'light' ? 'selected' : ''}>light</option>
-                            <option value="cover" ${component === 'cover' ? 'selected' : ''}>cover</option>
-                            <option value="climate" ${component === 'climate' ? 'selected' : ''}>climate</option>
-                            <option value="fan" ${component === 'fan' ? 'selected' : ''}>fan</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small">${t('mapping_editor.field_name', 'Name')}</label>
-                        <input type="text" class="form-control form-control-sm" placeholder="Temperature" value="${name}" data-field="name">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small">${t('mapping_editor.field_device_class', 'Device Class')}</label>
-                        <select class="form-select form-select-sm" data-field="device_class">
-                            ${getDeviceClassOptions(component, deviceClass)}
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small">${t('mapping_editor.field_icon', 'Icon')}</label>
-                        <input type="text" class="form-control form-control-sm" placeholder="mdi:thermometer" value="${icon}" data-field="icon">
-                    </div>
-                    <div class="col-md-1">
-                        <label class="form-label small">${t('mapping_editor.field_unit', 'Unit')}</label>
-                        <input type="text" class="form-control form-control-sm" placeholder="" value="${unit}" data-field="unit_of_measurement">
-                    </div>
-                    <div class="col-md-1">
-                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeInlineMappingRow(this)" title="${t('mapping_editor.field_remove', 'Remove')}">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
+                            <option value="binary_sensor" ${component==='binary_sensor'?'selected':''}>binary_sensor</option>
+                            <option value="sensor" ${component==='sensor'?'selected':''}>sensor</option>
+                            <option value="switch" ${component==='switch'?'selected':''}>switch</option>
+                            <option value="light" ${component==='light'?'selected':''}>light</option>
+                            <option value="cover" ${component==='cover'?'selected':''}>cover</option>
+                            <option value="climate" ${component==='climate'?'selected':''}>climate</option>
+                            <option value="fan" ${component==='fan'?'selected':''}>fan</option>
+                        </select></div>
+                    <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_name','Name')}</label>
+                        <input type="text" class="form-control form-control-sm" placeholder="Temperature" value="${name}" data-field="name"></div>
+                    <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_device_class','Device Class')}</label>
+                        <select class="form-select form-select-sm" data-field="device_class">${getDeviceClassOptions(component, deviceClass)}</select></div>
+                    <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_icon','Icon')}</label>
+                        <input type="text" class="form-control form-control-sm" placeholder="mdi:thermometer" value="${icon}" data-field="icon"></div>
+                    <div class="col-md-1"><label class="form-label small">${t('mapping_editor.field_unit','Unit')}</label>
+                        <input type="text" class="form-control form-control-sm" value="${unit}" data-field="unit_of_measurement"></div>
+                    <div class="col-md-1"><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeInlineMappingRow(this)"><i class="bi bi-trash"></i></button></div>
                 </div>
                 <div class="mt-1">
                     <a class="small text-muted text-decoration-none" data-bs-toggle="collapse" href="#inline-adv-${rowId}" role="button" aria-expanded="false">
-                        <i class="bi bi-chevron-right"></i> ${t('mapping_editor.advanced', 'Advanced')}
+                        <i class="bi bi-chevron-right"></i> ${t('mapping_editor.advanced','Advanced')}
                     </a>
                     <div class="collapse" id="inline-adv-${rowId}">
                         <div class="row g-2 mt-1">
-                            <div class="col-md-2">
-                                <label class="form-label small">${t('mapping_editor.field_state_class', 'State Class')}</label>
+                            <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_state_class','State Class')}</label>
                                 <select class="form-select form-select-sm" data-field="state_class">
-                                    <option value="" ${!stateClass ? 'selected' : ''}>${t('mapping_editor.none', '(none)')}</option>
-                                    <option value="measurement" ${stateClass === 'measurement' ? 'selected' : ''}>measurement</option>
-                                    <option value="total" ${stateClass === 'total' ? 'selected' : ''}>total</option>
-                                    <option value="total_increasing" ${stateClass === 'total_increasing' ? 'selected' : ''}>total_increasing</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small">${t('mapping_editor.field_entity_category', 'Entity Category')}</label>
+                                    <option value="" ${!stateClass?'selected':''}>${t('mapping_editor.none','(none)')}</option>
+                                    <option value="measurement" ${stateClass==='measurement'?'selected':''}>measurement</option>
+                                    <option value="total" ${stateClass==='total'?'selected':''}>total</option>
+                                    <option value="total_increasing" ${stateClass==='total_increasing'?'selected':''}>total_increasing</option>
+                                </select></div>
+                            <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_entity_category','Entity Category')}</label>
                                 <select class="form-select form-select-sm" data-field="entity_category">
-                                    <option value="" ${!entityCategory ? 'selected' : ''}>${t('mapping_editor.none', '(none)')}</option>
-                                    <option value="diagnostic" ${entityCategory === 'diagnostic' ? 'selected' : ''}>diagnostic</option>
-                                    <option value="config" ${entityCategory === 'config' ? 'selected' : ''}>config</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small">${t('mapping_editor.field_expire_after', 'Expire After (s)')}</label>
-                                <input type="number" class="form-control form-control-sm" placeholder="" value="${expireAfter}" data-field="expire_after" min="0">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small">${t('mapping_editor.field_precision', 'Precision')}</label>
-                                <input type="number" class="form-control form-control-sm" placeholder="" value="${precision}" data-field="suggested_display_precision" min="0" max="10">
-                            </div>
+                                    <option value="" ${!entityCategory?'selected':''}>${t('mapping_editor.none','(none)')}</option>
+                                    <option value="diagnostic" ${entityCategory==='diagnostic'?'selected':''}>diagnostic</option>
+                                    <option value="config" ${entityCategory==='config'?'selected':''}>config</option>
+                                </select></div>
+                            <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_expire_after','Expire After (s)')}</label>
+                                <input type="number" class="form-control form-control-sm" value="${expireAfter}" data-field="expire_after" min="0"></div>
+                            <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_precision','Precision')}</label>
+                                <input type="number" class="form-control form-control-sm" value="${precision}" data-field="suggested_display_precision" min="0" max="10"></div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" data-field="force_update" ${forceUpdate ? 'checked' : ''}>
-                                    <label class="form-check-label small">${t('mapping_editor.field_force_update', 'Force Update')}</label>
-                                </div>
-                            </div>
+                                    <input class="form-check-input" type="checkbox" data-field="force_update" ${forceUpdate?'checked':''}>
+                                    <label class="form-check-label small">${t('mapping_editor.field_force_update','Force Update')}</label>
+                                </div></div>
                         </div>
                         <div class="row g-2 mt-1">
-                            <div class="col-md-6">
-                                <label class="form-label small">${t('mapping_editor.field_value_template', 'Value Template')}</label>
-                                <input type="text" class="form-control form-control-sm font-monospace" placeholder="auto-generated" value="${valueTemplate.replace(/"/g, '&quot;')}" data-field="value_template">
-                            </div>
+                            <div class="col-md-6"><label class="form-label small">${t('mapping_editor.field_value_template','Value Template')}</label>
+                                <input type="text" class="form-control form-control-sm font-monospace" placeholder="auto-generated" value="${valueTemplate.replace(/"/g,'&quot;')}" data-field="value_template"></div>
                         </div>
                     </div>
-                </div>
-            `;
-
-            // Rotate chevron on collapse toggle
+                </div>`;
             const collapseEl = row.querySelector('.collapse');
-            collapseEl.addEventListener('show.bs.collapse', () => {
-                row.querySelector('.bi-chevron-right')?.classList.replace('bi-chevron-right', 'bi-chevron-down');
-            });
-            collapseEl.addEventListener('hide.bs.collapse', () => {
-                row.querySelector('.bi-chevron-down')?.classList.replace('bi-chevron-down', 'bi-chevron-right');
-            });
-
+            collapseEl.addEventListener('show.bs.collapse', () => row.querySelector('.bi-chevron-right')?.classList.replace('bi-chevron-right','bi-chevron-down'));
+            collapseEl.addEventListener('hide.bs.collapse', () => row.querySelector('.bi-chevron-down')?.classList.replace('bi-chevron-down','bi-chevron-right'));
             container.appendChild(row);
         }
 
         function removeInlineMappingRow(btn) {
             btn.closest('.inline-mapping-row').remove();
-            const container = document.getElementById('inline-mapping-rows');
-            if (container.children.length === 0) {
+            if (document.getElementById('inline-mapping-rows').children.length === 0)
                 document.getElementById('inline-mapping-empty').style.display = '';
-            }
         }
 
         function onInlineComponentChange(select) {
-            const row = select.closest('.inline-mapping-row');
-            const dcSelect = row.querySelector('[data-field="device_class"]');
-            dcSelect.innerHTML = getDeviceClassOptions(select.value, '');
+            select.closest('.inline-mapping-row').querySelector('[data-field="device_class"]').innerHTML = getDeviceClassOptions(select.value, '');
         }
 
         function collectInlineMapping() {
             const rows = document.querySelectorAll('.inline-mapping-row');
             if (rows.length === 0) return {};
-
-            const mapping = {};
-            let valid = true;
+            const mapping = {}; let valid = true;
             rows.forEach(row => {
                 const shortcut = (row.querySelector('[data-field="shortcut"]').value || '').trim();
                 if (!shortcut) { valid = false; return; }
                 const entry = { component: row.querySelector('[data-field="component"]').value };
-                const name = row.querySelector('[data-field="name"]').value.trim();
-                if (name) entry.name = name;
-                const dc = row.querySelector('[data-field="device_class"]').value;
-                if (dc) entry.device_class = dc;
-                const icon = row.querySelector('[data-field="icon"]').value.trim();
-                if (icon) entry.icon = icon;
-                const unit = row.querySelector('[data-field="unit_of_measurement"]').value.trim();
-                if (unit) entry.unit_of_measurement = unit;
-
-                // Advanced fields
-                const stateClass = row.querySelector('[data-field="state_class"]')?.value || '';
-                if (stateClass) entry.state_class = stateClass;
-                const entityCat = row.querySelector('[data-field="entity_category"]')?.value || '';
-                if (entityCat) entry.entity_category = entityCat;
-                const expireStr = row.querySelector('[data-field="expire_after"]')?.value || '';
-                if (expireStr !== '') entry.expire_after = parseInt(expireStr);
-                const precisionStr = row.querySelector('[data-field="suggested_display_precision"]')?.value || '';
-                if (precisionStr !== '') entry.suggested_display_precision = parseInt(precisionStr);
-                const forceUpdate = row.querySelector('[data-field="force_update"]')?.checked || false;
-                if (forceUpdate) entry.force_update = true;
-                const valTpl = row.querySelector('[data-field="value_template"]')?.value?.trim() || '';
-                if (valTpl) entry.value_template = valTpl;
-
+                const name = row.querySelector('[data-field="name"]').value.trim(); if (name) entry.name = name;
+                const dc = row.querySelector('[data-field="device_class"]').value; if (dc) entry.device_class = dc;
+                const icon = row.querySelector('[data-field="icon"]').value.trim(); if (icon) entry.icon = icon;
+                const unit = row.querySelector('[data-field="unit_of_measurement"]').value.trim(); if (unit) entry.unit_of_measurement = unit;
+                const stateClass = row.querySelector('[data-field="state_class"]')?.value || ''; if (stateClass) entry.state_class = stateClass;
+                const entityCat = row.querySelector('[data-field="entity_category"]')?.value || ''; if (entityCat) entry.entity_category = entityCat;
+                const expireStr = row.querySelector('[data-field="expire_after"]')?.value || ''; if (expireStr !== '') entry.expire_after = parseInt(expireStr);
+                const precisionStr = row.querySelector('[data-field="suggested_display_precision"]')?.value || ''; if (precisionStr !== '') entry.suggested_display_precision = parseInt(precisionStr);
+                const forceUpdate = row.querySelector('[data-field="force_update"]')?.checked || false; if (forceUpdate) entry.force_update = true;
+                const valTpl = row.querySelector('[data-field="value_template"]')?.value?.trim() || ''; if (valTpl) entry.value_template = valTpl;
                 mapping[shortcut] = entry;
             });
             if (!valid) return undefined;
@@ -2026,21 +2061,15 @@
             try {
                 const resp = await fetch(getApiUrl(`/api/eep/${eepId}`));
                 const profile = await resp.json();
-
                 const container = document.getElementById('inline-mapping-rows');
                 container.innerHTML = '';
                 document.getElementById('inline-mapping-empty').style.display = 'none';
-
                 if (profile.fields && profile.fields.length > 0) {
                     for (const field of profile.fields) {
-                        const shortcut = field.shortcut || '';
-                        if (!shortcut) continue;
-                        // Guess component from field description/type
+                        const shortcut = field.shortcut || ''; if (!shortcut) continue;
                         let component = 'sensor';
                         const desc = (field.description || '').toLowerCase();
-                        if (desc.includes('switch') || desc.includes('button') || desc.includes('rocker')) component = 'binary_sensor';
-                        if (desc.includes('alarm') || desc.includes('contact') || desc.includes('occupancy')) component = 'binary_sensor';
-                        // Guess device class
+                        if (desc.includes('switch') || desc.includes('button') || desc.includes('rocker') || desc.includes('alarm') || desc.includes('contact') || desc.includes('occupancy')) component = 'binary_sensor';
                         let dc = '';
                         if (desc.includes('temperature') || desc.includes('temp')) dc = 'temperature';
                         else if (desc.includes('humidity')) dc = 'humidity';
@@ -2054,18 +2083,12 @@
                         else if (desc.includes('motion')) { dc = 'motion'; component = 'binary_sensor'; }
                         else if (desc.includes('window')) { dc = 'window'; component = 'binary_sensor'; }
                         else if (desc.includes('door')) { dc = 'door'; component = 'binary_sensor'; }
-                        // Guess unit
                         let unit = '';
-                        if (dc === 'temperature') unit = '°C';
-                        else if (dc === 'humidity') unit = '%';
-                        else if (dc === 'illuminance') unit = 'lx';
-                        else if (dc === 'voltage') unit = 'V';
-                        else if (dc === 'current') unit = 'A';
-                        else if (dc === 'power') unit = 'W';
-                        else if (dc === 'energy') unit = 'kWh';
-                        else if (dc === 'pressure') unit = 'hPa';
+                        if (dc === 'temperature') unit = '°C'; else if (dc === 'humidity') unit = '%';
+                        else if (dc === 'illuminance') unit = 'lx'; else if (dc === 'voltage') unit = 'V';
+                        else if (dc === 'current') unit = 'A'; else if (dc === 'power') unit = 'W';
+                        else if (dc === 'energy') unit = 'kWh'; else if (dc === 'pressure') unit = 'hPa';
                         else if (dc === 'battery') unit = '%';
-
                         addInlineMappingRow(shortcut, component, field.description || '', dc, '', unit);
                     }
                     showToast(t('mapping_editor.prefilled', 'Fields pre-filled from EEP profile'), 'success');
@@ -2073,152 +2096,82 @@
                     document.getElementById('inline-mapping-empty').style.display = '';
                     showToast(t('mapping_editor.no_fields', 'No fields found in profile'), 'warning');
                 }
-            } catch (e) {
-                showToast(t('mapping_editor.load_fields_failed', 'Failed to load profile fields'), 'danger');
-            }
+            } catch (e) { showToast(t('mapping_editor.load_fields_failed', 'Failed to load profile fields'), 'danger'); }
         }
 
         async function saveMappingOverride(eepId) {
             const mapping = getInlineMappingData();
-            if (mapping === undefined) {
-                showToast(t('mapping_editor.need_shortcut', 'All rows must have a shortcut name (or fix YAML errors)'), 'warning');
-                return;
-            }
-
+            if (mapping === undefined) { showToast(t('mapping_editor.need_shortcut', 'All rows must have a shortcut name (or fix YAML errors)'), 'warning'); return; }
             try {
                 const resp = await fetch(getApiUrl(`/api/eep/${eepId}/mapping`), {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(mapping)
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(mapping)
                 });
-                if (!resp.ok) {
-                    const err = await resp.json().catch(() => null);
-                    throw new Error(err?.detail || t('mapping_editor.save_failed', 'Save failed'));
-                }
+                if (!resp.ok) { const err = await resp.json().catch(() => null); throw new Error(err?.detail || t('mapping_editor.save_failed', 'Save failed')); }
                 showToast(t('mapping_editor.saved', 'Mapping saved'), 'success');
-                closeMappingEditor();
-                showProfileDetails(eepId);
-                // Refresh the profile tree to update "Customized" indicators
-                loadProfiles();
-            } catch (e) {
-                showToast(e.message, 'danger');
-            }
+                closeMappingEditor(); showProfileDetails(eepId); loadProfiles();
+            } catch (e) { showToast(e.message, 'danger'); }
         }
 
         async function resetMappingOverride(eepId) {
             if (!confirm(t('mapping_editor.reset_confirm', 'Reset mapping to EEP.xml default? Your customization will be removed.'))) return;
             try {
                 const resp = await fetch(getApiUrl(`/api/eep/${eepId}/mapping`), { method: 'DELETE' });
-                if (!resp.ok) {
-                    const err = await resp.json().catch(() => null);
-                    throw new Error(err?.detail || t('mapping_editor.reset_failed', 'Reset failed'));
-                }
+                if (!resp.ok) { const err = await resp.json().catch(() => null); throw new Error(err?.detail || t('mapping_editor.reset_failed', 'Reset failed')); }
                 showToast(t('mapping_editor.reset_success', 'Mapping reset to default'), 'success');
-                showProfileDetails(eepId);
-                // Refresh the profile tree to update indicators
-                loadProfiles();
-            } catch (e) {
-                showToast(e.message, 'danger');
-            }
+                showProfileDetails(eepId); loadProfiles();
+            } catch (e) { showToast(e.message, 'danger'); }
         }
 
         async function deleteCustomProfile(eepId) {
             if (!confirm(`${t('profile.delete_confirm', 'Delete custom profile')} ${eepId}? ${t('common.cannot_undo', 'This cannot be undone.')}`)) return;
-
             try {
                 const response = await fetch(getApiUrl(`/api/eep/custom/${eepId}`), {method: 'DELETE'});
-                if (!response.ok) {
-                    const errData = await response.json().catch(() => null);
-                    throw new Error(errData?.detail || `Server error (${response.status})`);
-                }
+                if (!response.ok) { const errData = await response.json().catch(() => null); throw new Error(errData?.detail || `Server error (${response.status})`); }
                 document.getElementById('profile-details').innerHTML = `<p class="text-muted">${t('profiles.select_hint', 'Select a profile to view details')}</p>`;
-                loadProfiles();
-                showToast(`${t('profile.deleted', 'Profile deleted')}: ${eepId}`, 'success');
-            } catch (error) {
-                showToast(error.message, 'danger');
-            }
+                loadProfiles(); showToast(`${t('profile.deleted', 'Profile deleted')}: ${eepId}`, 'success');
+            } catch (error) { showToast(error.message, 'danger'); }
         }
 
         async function editCustomProfile(eepId) {
             try {
                 const response = await fetch(getApiUrl(`/api/eep/${eepId}`));
                 const profile = await response.json();
-
-                if (!profile.is_custom) {
-                    showToast(t('profile.only_custom_editable', 'Only custom profiles can be edited'), 'danger');
-                    return;
-                }
-
-                // Reset text mode before populating
+                if (!profile.is_custom) { showToast(t('profile.only_custom_editable', 'Only custom profiles can be edited'), 'danger'); return; }
                 _resetHaTextMode();
-
-                // Populate the modal form with existing data
                 const form = document.getElementById('custom-profile-form');
                 form.querySelector('[name="rorg"]').value = profile.rorg;
                 form.querySelector('[name="func"]').value = profile.func;
                 form.querySelector('[name="type"]').value = profile.type;
                 form.querySelector('[name="description"]').value = profile.description;
-                form.querySelector('[name="fields"]').value = profile.fields.length
-                    ? JSON.stringify(profile.fields, null, 2)
-                    : '';
-
-                // Populate HA mapping builder
+                form.querySelector('[name="fields"]').value = profile.fields.length ? JSON.stringify(profile.fields, null, 2) : '';
                 populateHaMapping(profile.ha_mapping || {});
-
-                // Mark as editing (store original eep_id)
                 form.dataset.editEepId = eepId;
-
-                // Update modal title
                 document.querySelector('#customProfileModal .modal-title').textContent = `Edit Custom Profile: ${eepId}`;
-
-                // Show modal
                 new bootstrap.Modal(document.getElementById('customProfileModal')).show();
-            } catch (error) {
-                showToast(t('profile.load_edit_failed', 'Failed to load profile for editing'), 'danger');
-            }
+            } catch (error) { showToast(t('profile.load_edit_failed', 'Failed to load profile for editing'), 'danger'); }
         }
 
         async function forkStandardProfile(eepId) {
             try {
                 const response = await fetch(getApiUrl(`/api/eep/${eepId}`));
                 const profile = await response.json();
-
-                // Also fetch mapping override if exists
                 const mappingResp = await fetch(getApiUrl(`/api/eep/${eepId}/mapping`));
                 const mappingData = await mappingResp.json();
-
-                // Reset text mode before populating
                 _resetHaTextMode();
-
-                // Populate the modal form with standard profile data
                 const form = document.getElementById('custom-profile-form');
-                form.reset();
-                delete form.dataset.editEepId;
+                form.reset(); delete form.dataset.editEepId;
                 form.querySelector('[name="rorg"]').value = profile.rorg;
                 form.querySelector('[name="func"]').value = profile.func;
                 form.querySelector('[name="type"]').value = profile.type;
                 form.querySelector('[name="description"]').value = profile.description;
-                form.querySelector('[name="fields"]').value = profile.fields.length
-                    ? JSON.stringify(profile.fields, null, 2)
-                    : '';
-
-                // Populate HA mapping from override or default
-                const effectiveMapping = mappingData.mapping || {};
-                populateHaMapping(effectiveMapping);
-
-                // Update modal title
+                form.querySelector('[name="fields"]').value = profile.fields.length ? JSON.stringify(profile.fields, null, 2) : '';
+                populateHaMapping(mappingData.mapping || {});
                 document.querySelector('#customProfileModal .modal-title').textContent = `${t('modal.fork_title', 'Fork Standard Profile')}: ${eepId}`;
-
-                // Show modal
                 new bootstrap.Modal(document.getElementById('customProfileModal')).show();
-            } catch (error) {
-                showToast(t('profile.load_fork_failed', 'Failed to load profile for forking'), 'danger');
-            }
+            } catch (error) { showToast(t('profile.load_fork_failed', 'Failed to load profile for forking'), 'danger'); }
         }
 
-        // ===== Actuator Teach-In Functions =====
         function showActuatorTeachIn() {
-            // Cancel any running automatic teach-in first
             cancelTeachIn();
             document.getElementById('actuator-teach-in-panel').style.display = 'block';
             readBaseId();
@@ -2234,15 +2187,9 @@
             try {
                 const resp = await fetch(getApiUrl('/api/gateway/read-base-id'), { method: 'POST' });
                 const data = await resp.json();
-                if (resp.ok && data.base_id) {
-                    input.value = data.base_id;
-                    updateDerivedSenderId();
-                } else {
-                    input.value = 'Error: ' + (data.detail || 'unknown');
-                }
-            } catch (e) {
-                input.value = 'Error: ' + e.message;
-            }
+                if (resp.ok && data.base_id) { input.value = data.base_id; updateDerivedSenderId(); }
+                else input.value = 'Error: ' + (data.detail || 'unknown');
+            } catch (e) { input.value = 'Error: ' + e.message; }
         }
 
         function updateDerivedSenderId() {
@@ -2251,12 +2198,10 @@
             const output = document.getElementById('derived-sender-id');
             if (baseId && baseId.startsWith('0x')) {
                 const base = parseInt(baseId, 16);
-                const sender = base + offset;
-                output.value = '0x' + sender.toString(16).toUpperCase().padStart(8, '0');
+                output.value = '0x' + (base + offset).toString(16).toUpperCase().padStart(8, '0');
             }
         }
 
-        // Update derived sender ID when offset changes
         document.getElementById('sender-offset')?.addEventListener('input', updateDerivedSenderId);
 
         async function sendActuatorTeachIn() {
@@ -2264,39 +2209,26 @@
             const offset = parseInt(document.getElementById('sender-offset').value) || 1;
             const actuatorType = document.getElementById('actuator-type-teach-in').value;
             const resultDiv = document.getElementById('actuator-teach-in-result');
-
-            if (!address) {
-                resultDiv.innerHTML = '<div class="alert alert-danger">Enter the actuator address</div>';
-                resultDiv.style.display = 'block';
-                return;
-            }
-
+            if (!address) { resultDiv.innerHTML = '<div class="alert alert-danger">Enter the actuator address</div>'; resultDiv.style.display = 'block'; return; }
             const proto = actuatorType === 'light' ? 'A5-38-08 (Central Command)' : 'F6 (Rocker)';
-            resultDiv.innerHTML = `<div class="alert alert-info"><i class="bi bi-hourglass-split"></i> ${t('teach_in.sending', 'Sending')} ${proto} teach-in...</div>`;
+            resultDiv.innerHTML = `<div class="alert alert-info"><i class="bi bi-hourglass-split"></i> ${t('teach_in.sending','Sending')} ${proto} teach-in...</div>`;
             resultDiv.style.display = 'block';
-
             try {
                 const resp = await fetch(getApiUrl('/api/gateway/teach-in-actuator'), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ destination: address, sender_offset: offset, actuator_type: actuatorType })
                 });
                 const data = await resp.json();
-
                 if (resp.ok) {
-                    resultDiv.innerHTML = `<div class="alert alert-success">
-                        <i class="bi bi-check-circle"></i> <strong>${t('teach_in.teach_in_sent', 'Teach-in sent!')}</strong> (${data.teach_type || proto})<br>
-                        ${t('teach_in.sender_id', 'Sender ID')}: <code>${data.sender_id}</code> → ${t('teach_in.destination', 'Destination')}: <code>${data.destination}</code><br>
+                    resultDiv.innerHTML = `<div class="alert alert-success"><i class="bi bi-check-circle"></i> <strong>${t('teach_in.teach_in_sent','Teach-in sent!')}</strong> (${data.teach_type || proto})<br>
+                        ${t('teach_in.sender_id','Sender ID')}: <code>${data.sender_id}</code> → ${t('teach_in.destination','Destination')}: <code>${data.destination}</code><br>
                         <small class="text-muted">${data.message}</small><br><br>
-                        <strong>${t('teach_in.next_step', 'Next')}:</strong> ${t('teach_in.next_step_desc', 'Use "Manual Entry" to add this device with sender ID')} <code>${data.sender_id}</code>
-                        ${t('teach_in.and_actuator_type', 'and actuator type')} <code>${actuatorType}</code>
-                    </div>`;
+                        <strong>${t('teach_in.next_step','Next')}:</strong> ${t('teach_in.next_step_desc','Use "Manual Entry" to add this device with sender ID')} <code>${data.sender_id}</code>
+                        ${t('teach_in.and_actuator_type','and actuator type')} <code>${actuatorType}</code></div>`;
                 } else {
-                    resultDiv.innerHTML = `<div class="alert alert-danger"><i class="bi bi-x-circle"></i> ${data.detail || t('common.unknown_error', 'Unknown error')}</div>`;
+                    resultDiv.innerHTML = `<div class="alert alert-danger"><i class="bi bi-x-circle"></i> ${data.detail || t('common.unknown_error','Unknown error')}</div>`;
                 }
-            } catch (e) {
-                resultDiv.innerHTML = `<div class="alert alert-danger"><i class="bi bi-x-circle"></i> ${e.message}</div>`;
-            }
+            } catch (e) { resultDiv.innerHTML = `<div class="alert alert-danger"><i class="bi bi-x-circle"></i> ${e.message}</div>`; }
         }
 
         async function sendRepeatTeachIn() {
@@ -2305,140 +2237,81 @@
             const actuatorType = document.getElementById('actuator-type-teach-in').value;
             const resultDiv = document.getElementById('actuator-teach-in-result');
             const btn = document.getElementById('btn-repeat-teach-in');
-
-            if (!address) {
-                resultDiv.innerHTML = '<div class="alert alert-danger">Enter the actuator address</div>';
-                resultDiv.style.display = 'block';
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Sending... (30s)';
+            if (!address) { resultDiv.innerHTML = '<div class="alert alert-danger">Enter the actuator address</div>'; resultDiv.style.display = 'block'; return; }
+            btn.disabled = true; btn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Sending... (30s)';
             const proto = actuatorType === 'light' ? 'A5-38-08' : 'F6 Rocker';
-            resultDiv.innerHTML = `<div class="alert alert-warning">
-                <i class="bi bi-broadcast"></i> <strong>Sending ${proto} teach-in repeatedly for 30 seconds...</strong><br>
-                Put the actuator in learn mode NOW! (Place it next to the USB300)
-            </div>`;
+            resultDiv.innerHTML = `<div class="alert alert-warning"><i class="bi bi-broadcast"></i> <strong>Sending ${proto} teach-in repeatedly for 30 seconds...</strong><br>Put the actuator in learn mode NOW! (Place it next to the USB300)</div>`;
             resultDiv.style.display = 'block';
-
             try {
                 const resp = await fetch(getApiUrl('/api/gateway/teach-in-repeat'), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        destination: address, sender_offset: offset,
-                        actuator_type: actuatorType,
-                        duration_seconds: 30, interval_seconds: 5
-                    })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ destination: address, sender_offset: offset, actuator_type: actuatorType, duration_seconds: 30, interval_seconds: 5 })
                 });
                 const data = await resp.json();
-
                 if (resp.ok) {
-                    resultDiv.innerHTML = `<div class="alert alert-success">
-                        <i class="bi bi-check-circle"></i> <strong>${data.rounds_sent} teach-in rounds sent!</strong> (${data.teach_type})<br>
-                        Sender ID: <code>${data.sender_id}</code><br>
-                        <small>${data.message}</small>
-                    </div>`;
+                    resultDiv.innerHTML = `<div class="alert alert-success"><i class="bi bi-check-circle"></i> <strong>${data.rounds_sent} teach-in rounds sent!</strong> (${data.teach_type})<br>Sender ID: <code>${data.sender_id}</code><br><small>${data.message}</small></div>`;
                 } else {
                     resultDiv.innerHTML = `<div class="alert alert-danger"><i class="bi bi-x-circle"></i> ${data.detail || 'Error'}</div>`;
                 }
-            } catch (e) {
-                resultDiv.innerHTML = `<div class="alert alert-danger"><i class="bi bi-x-circle"></i> ${e.message}</div>`;
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Repeat Teach-In (30s)';
-            }
+            } catch (e) { resultDiv.innerHTML = `<div class="alert alert-danger"><i class="bi bi-x-circle"></i> ${e.message}</div>`; }
+            finally { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Repeat Teach-In (30s)'; }
         }
 
         let _testActuatorBusy = false;
         async function testActuator(deviceName, command) {
-            // Debounce: prevent double-send from rapid clicks
             if (_testActuatorBusy) return;
-            _testActuatorBusy = true;
-            setTimeout(() => { _testActuatorBusy = false; }, 1500);
-
+            _testActuatorBusy = true; setTimeout(() => { _testActuatorBusy = false; }, 1500);
             const resultSpan = document.getElementById('test-actuator-result');
             resultSpan.innerHTML = '<span class="text-info"><i class="bi bi-hourglass-split"></i> Sending...</span>';
-
             try {
                 const resp = await fetch(getApiUrl('/api/gateway/test-actuator'), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ device_name: deviceName, command: command })
                 });
                 const data = await resp.json();
-
-                if (resp.ok) {
-                    resultSpan.innerHTML = `<span class="text-success"><i class="bi bi-check-circle"></i> ${command} sent to ${deviceName}</span>`;
-                } else {
-                    resultSpan.innerHTML = `<span class="text-danger"><i class="bi bi-x-circle"></i> ${data.detail || 'Error'}</span>`;
-                }
-            } catch (e) {
-                resultSpan.innerHTML = `<span class="text-danger"><i class="bi bi-x-circle"></i> ${e.message}</span>`;
-            }
-
-            // Clear result after 5 seconds
+                resultSpan.innerHTML = resp.ok
+                    ? `<span class="text-success"><i class="bi bi-check-circle"></i> ${command} sent to ${deviceName}</span>`
+                    : `<span class="text-danger"><i class="bi bi-x-circle"></i> ${data.detail || 'Error'}</span>`;
+            } catch (e) { resultSpan.innerHTML = `<span class="text-danger"><i class="bi bi-x-circle"></i> ${e.message}</span>`; }
             setTimeout(() => { resultSpan.innerHTML = ''; }, 5000);
         }
 
         let teachInTimer = null;
 
         function startTeachIn() {
-            // Auto-close actuator panel if open
             document.getElementById('actuator-teach-in-panel').style.display = 'none';
-
             const status = document.getElementById('teach-in-status');
             status.style.display = 'block';
-
-            // Start 60-second countdown
             let remaining = 60;
             const countdownEl = document.getElementById('teach-in-countdown');
             countdownEl.textContent = `(${remaining}s)`;
             teachInTimer = setInterval(() => {
                 remaining--;
                 countdownEl.textContent = `(${remaining}s)`;
-                if (remaining <= 0) {
-                    cancelTeachIn();
-                    showToast(t('teach_in.timeout', 'Teach-in timed out — no device detected'), 'warning');
-                }
+                if (remaining <= 0) { cancelTeachIn(); showToast(t('teach_in.timeout', 'Teach-in timed out — no device detected'), 'warning'); }
             }, 1000);
-
-            // Connect to WebSocket
             teachInSocket = new WebSocket(getWsUrl('/api/gateway/teach-in'));
-
             teachInSocket.onmessage = function(event) {
                 const data = JSON.parse(event.data);
                 if (data.type === 'teach_in') {
-                    // Auto-fill form with detected device
                     document.querySelector('[name="address"]').value = data.data.sender_id;
                     document.querySelector('[name="rorg"]').value = data.data.rorg;
                     document.querySelector('[name="func"]').value = data.data.func;
                     document.querySelector('[name="type"]').value = data.data.type;
-
-                    cancelTeachIn();
-                    wizardNext();
-
+                    cancelTeachIn(); wizardNext();
                     showToast(t('teach_in.detected', 'Device detected!'), 'success');
                 }
             };
-
             teachInSocket.onerror = function() {
-                cancelTeachIn();
-                status.style.display = 'block';
+                cancelTeachIn(); status.style.display = 'block';
                 status.querySelector('.alert').className = 'alert alert-danger';
                 status.querySelector('.alert').innerHTML = '<i class="bi bi-x-circle"></i> Connection failed. EnOcean gateway may not be connected.';
             };
         }
 
         function cancelTeachIn() {
-            if (teachInTimer) {
-                clearInterval(teachInTimer);
-                teachInTimer = null;
-            }
-            if (teachInSocket) {
-                teachInSocket.close();
-                teachInSocket = null;
-            }
+            if (teachInTimer) { clearInterval(teachInTimer); teachInTimer = null; }
+            if (teachInSocket) { teachInSocket.close(); teachInSocket = null; }
             document.getElementById('teach-in-status').style.display = 'none';
         }
 
@@ -2446,60 +2319,37 @@
             const senderGroup = document.getElementById('sender-id-group');
             if (senderGroup) {
                 senderGroup.style.display = select.value ? '' : 'none';
-                // Clear sender_id when switching back to sensor
-                if (!select.value) {
-                    const input = senderGroup.querySelector('input[name="sender_id"]');
-                    if (input) input.value = '';
-                }
+                if (!select.value) { const input = senderGroup.querySelector('input[name="sender_id"]'); if (input) input.value = ''; }
             }
         }
 
         function resetTeachInPage() {
             cancelTeachIn();
             document.getElementById('actuator-teach-in-panel').style.display = 'none';
-            // Reset wizard to step 1
-            document.querySelectorAll('.wizard-step').forEach((step, i) => {
-                step.classList.toggle('active', i === 0);
-            });
+            document.querySelectorAll('.wizard-step').forEach((step, i) => step.classList.toggle('active', i === 0));
         }
 
-        function showManualEntry() {
-            wizardNext();
-        }
+        function showManualEntry() { wizardNext(); }
 
         function wizardNext() {
             const steps = document.querySelectorAll('.wizard-step');
             let currentIndex = -1;
-            steps.forEach((step, index) => {
-                if (step.classList.contains('active')) currentIndex = index;
-            });
-            if (currentIndex < steps.length - 1) {
-                steps[currentIndex].classList.remove('active');
-                steps[currentIndex + 1].classList.add('active');
-            }
+            steps.forEach((step, index) => { if (step.classList.contains('active')) currentIndex = index; });
+            if (currentIndex < steps.length - 1) { steps[currentIndex].classList.remove('active'); steps[currentIndex + 1].classList.add('active'); }
         }
 
         function wizardBack() {
             const steps = document.querySelectorAll('.wizard-step');
             let currentIndex = -1;
-            steps.forEach((step, index) => {
-                if (step.classList.contains('active')) currentIndex = index;
-            });
-            if (currentIndex > 0) {
-                steps[currentIndex].classList.remove('active');
-                steps[currentIndex - 1].classList.add('active');
-            }
+            steps.forEach((step, index) => { if (step.classList.contains('active')) currentIndex = index; });
+            if (currentIndex > 0) { steps[currentIndex].classList.remove('active'); steps[currentIndex - 1].classList.add('active'); }
         }
 
         function resetWizard() {
-            document.querySelectorAll('.wizard-step').forEach((step, index) => {
-                step.classList.toggle('active', index === 0);
-            });
+            document.querySelectorAll('.wizard-step').forEach((step, index) => step.classList.toggle('active', index === 0));
             const form = document.getElementById('device-form');
-            form.reset();
-            delete form.dataset.editMode;
+            form.reset(); delete form.dataset.editMode;
             document.querySelector('[name="name"]').readOnly = false;
-            // Hide sender_id field (default: sensor mode)
             const senderGroup = document.getElementById('sender-id-group');
             if (senderGroup) senderGroup.style.display = 'none';
             const submitBtn = form.querySelector('button[type="submit"]');
@@ -2514,73 +2364,37 @@
             const formData = new FormData(form);
             const device = Object.fromEntries(formData);
             const editMode = form.dataset.editMode;
-
             try {
                 let response;
                 if (editMode) {
-                    // Update existing device
-                    response = await fetch(getApiUrl(`/api/devices/${editMode}`), {
-                        method: 'PUT',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify(device)
-                    });
+                    response = await fetch(getApiUrl(`/api/devices/${editMode}`), { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(device) });
                 } else {
-                    // Create new device
-                    response = await fetch(getApiUrl('/api/devices'), {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify(device)
-                    });
+                    response = await fetch(getApiUrl('/api/devices'), { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(device) });
                 }
-
                 if (!response.ok) {
                     let errorMsg = t('device.save_failed', 'Failed to save device');
-                    try {
-                        const error = await response.json();
-                        errorMsg = error.detail || errorMsg;
-                    } catch (parseError) {
-                        errorMsg = `Server error: ${response.status} ${response.statusText}`;
-                    }
+                    try { const error = await response.json(); errorMsg = error.detail || errorMsg; }
+                    catch (parseError) { errorMsg = `Server error: ${response.status} ${response.statusText}`; }
                     throw new Error(errorMsg);
                 }
-
-                // Clear edit mode and reset form state
                 delete form.dataset.editMode;
                 document.querySelector('[name="name"]').readOnly = false;
                 const submitBtn = form.querySelector('button[type="submit"]');
                 if (submitBtn) submitBtn.textContent = t('teach_in.add_device', 'Add Device');
                 const heading = document.querySelector('#step-2 h4');
                 if (heading) heading.textContent = t('teach_in.step2', 'Step 2: Configure Device');
-
-                if (editMode) {
-                    // After editing, go back to devices page
-                    showToast(t('device.updated', 'Device updated successfully'), 'success');
-                    navigateTo('devices');
-                } else {
-                    // After adding new device, show success screen
-                    wizardNext();
-                    showToast(t('device.saved', 'Device saved successfully'), 'success');
-                }
+                if (editMode) { showToast(t('device.updated', 'Device updated successfully'), 'success'); navigateTo('devices'); }
+                else { wizardNext(); showToast(t('device.saved', 'Device saved successfully'), 'success'); }
                 loadDevices();
-            } catch (error) {
-                showToast(error.message, 'danger');
-            }
+            } catch (error) { showToast(error.message, 'danger'); }
         }
 
         async function editDevice(name) {
             try {
                 const response = await fetch(getApiUrl(`/api/devices/${name}`));
                 const device = await response.json();
-
-                // Navigate to teach-in page
                 navigateTo('teach-in');
-
-                // Go directly to step-2 (form) regardless of current wizard state
-                document.querySelectorAll('.wizard-step').forEach((step, index) => {
-                    step.classList.toggle('active', index === 1);
-                });
-
-                // Fill in form fields
+                document.querySelectorAll('.wizard-step').forEach((step, index) => step.classList.toggle('active', index === 1));
                 document.querySelector('[name="name"]').value = device.name;
                 document.querySelector('[name="address"]').value = device.address;
                 document.querySelector('[name="rorg"]').value = device.rorg;
@@ -2591,158 +2405,104 @@
                 document.querySelector('[name="actuator_type"]').value = device.actuator_type || '';
                 document.querySelector('[name="sender_id"]').value = device.sender_id || '';
                 document.querySelector('[name="manufacturer"]').value = device.manufacturer || '';
-                // Show/hide sender_id field based on actuator type
                 const senderGroup = document.getElementById('sender-id-group');
                 if (senderGroup) senderGroup.style.display = device.actuator_type ? '' : 'none';
-
-                // Mark as edit mode
                 const form = document.getElementById('device-form');
                 form.dataset.editMode = name;
-
-                // Change button text and disable name field
                 const submitBtn = form.querySelector('button[type="submit"]');
                 if (submitBtn) submitBtn.textContent = t('device.save', 'Save Device');
                 document.querySelector('[name="name"]').readOnly = true;
-
-                // Update heading
                 const heading = document.querySelector('#step-2 h4');
                 if (heading) heading.textContent = t('device.edit', 'Edit Device');
-
-            } catch (error) {
-                showToast(t('device.load_failed', 'Failed to load device'), 'danger');
-            }
+            } catch (error) { showToast(t('device.load_failed', 'Failed to load device'), 'danger'); }
         }
 
         async function showDeviceDetail(name) {
             try {
                 const response = await fetch(getApiUrl(`/api/devices/${name}`));
                 const device = await response.json();
-
-                // Fetch recent telegrams for this device
                 let telegrams = [];
                 try {
                     const tRes = await fetch(getApiUrl(`/api/gateway/recent-telegrams?limit=100`));
                     const allTelegrams = await tRes.json();
-                    telegrams = allTelegrams.filter(t =>
-                        t.device_name === name || t.sender_id === device.address
-                    ).slice(0, 20);
-                } catch (e) { /* ignore */ }
-
-                // Build detail view in the devices page
+                    telegrams = allTelegrams.filter(t => t.device_name === name || t.sender_id === device.address).slice(0, 20);
+                } catch (e) {}
                 const container = document.getElementById('device-list');
                 container.innerHTML = `
                     <div class="col-12">
                         <div class="mb-3">
-                            <button class="btn btn-outline-secondary btn-sm" onclick="loadDevices()">
-                                <i class="bi bi-arrow-left"></i> ${t('device.back', 'Back to Devices')}
-                            </button>
-                            <button class="btn btn-outline-primary btn-sm ms-2" onclick="editDevice('${device.name}')">
-                                <i class="bi bi-pencil"></i> ${t('device.edit', 'Edit Device')}
-                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="loadDevices()"><i class="bi bi-arrow-left"></i> ${t('device.back','Back to Devices')}</button>
+                            <button class="btn btn-outline-primary btn-sm ms-2" onclick="editDevice('${device.name}')"><i class="bi bi-pencil"></i> ${t('device.edit','Edit Device')}</button>
                         </div>
-
                         <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="mb-0"><i class="bi bi-cpu"></i> ${device.name}</h5>
-                            </div>
+                            <div class="card-header"><h5 class="mb-0"><i class="bi bi-cpu"></i> ${device.name}</h5></div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <table class="table table-sm">
-                                            <tr><th>${t('device.address', 'Address')}</th><td><code>${device.address}</code></td></tr>
-                                            <tr><th>${t('device.eep_profile', 'EEP Profile')}</th><td><span class="badge bg-primary">${device.rorg}-${device.func}-${device.type}</span></td></tr>
-                                            ${device.description ? `<tr><th>${t('device.description', 'Description')}</th><td>${device.description}</td></tr>` : ''}
-                                            ${device.room ? `<tr><th>${t('device.room', 'Room')}</th><td>${device.room}</td></tr>` : ''}
-                                            ${device.sender_id ? `<tr><th>${t('device.sender_id', 'Sender ID')}</th><td><code>${device.sender_id}</code></td></tr>` : ''}
-                                            ${device.actuator_type ? `<tr><th>${t('device.device_role', 'Device Role')}</th><td><span class="badge bg-warning text-dark">${device.actuator_type}</span></td></tr>` : ''}
-                                            ${device.manufacturer ? `<tr><th>${t('device.manufacturer', 'Manufacturer')}</th><td>${device.manufacturer}</td></tr>` : ''}
+                                            <tr><th>${t('device.address','Address')}</th><td><code>${device.address}</code></td></tr>
+                                            <tr><th>${t('device.eep_profile','EEP Profile')}</th><td><span class="badge bg-primary">${device.rorg}-${device.func}-${device.type}</span></td></tr>
+                                            ${device.description ? `<tr><th>${t('device.description','Description')}</th><td>${device.description}</td></tr>` : ''}
+                                            ${device.room ? `<tr><th>${t('device.room','Room')}</th><td>${device.room}</td></tr>` : ''}
+                                            ${device.sender_id ? `<tr><th>${t('device.sender_id','Sender ID')}</th><td><code>${device.sender_id}</code></td></tr>` : ''}
+                                            ${device.actuator_type ? `<tr><th>${t('device.device_role','Device Role')}</th><td><span class="badge bg-warning text-dark">${device.actuator_type}</span></td></tr>` : ''}
+                                            ${device.manufacturer ? `<tr><th>${t('device.manufacturer','Manufacturer')}</th><td>${device.manufacturer}</td></tr>` : ''}
                                         </table>
                                     </div>
                                     <div class="col-md-6">
-                                        <h6>${t('device.mqtt_topics', 'MQTT Topics')}</h6>
-                                        <small class="text-muted">
-                                            <code>enocean/${device.name}/state</code><br>
-                                            ${device.sender_id ? `<code>enocean/${device.name}/set</code>` : ''}
-                                        </small>
+                                        <h6>${t('device.mqtt_topics','MQTT Topics')}</h6>
+                                        <small class="text-muted"><code>enocean/${device.name}/state</code><br>${device.sender_id ? `<code>enocean/${device.name}/set</code>` : ''}</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                         ${device.actuator_type ? `
                         <div class="card mb-3">
-                            <div class="card-header bg-warning bg-opacity-25">
-                                <h6 class="mb-0"><i class="bi bi-lightning"></i> ${t('device.actuator_test', 'Actuator Test')}</h6>
-                            </div>
+                            <div class="card-header bg-warning bg-opacity-25"><h6 class="mb-0"><i class="bi bi-lightning"></i> ${t('device.actuator_test','Actuator Test')}</h6></div>
                             <div class="card-body">
-                                <p class="small text-muted mb-2">${t('device.actuator_hint', 'Send F6 rocker commands directly to test if teach-in was successful.')}</p>
+                                <p class="small text-muted mb-2">${t('device.actuator_hint','Send F6 rocker commands directly to test if teach-in was successful.')}</p>
                                 <div class="d-flex gap-2 align-items-center flex-wrap">
                                     ${device.actuator_type === 'cover' ? `
-                                        <button class="btn btn-success" onclick="testActuator('${device.name}', 'OPEN')">
-                                            <i class="bi bi-arrow-up"></i> ${t('device.open', 'Open')}
-                                        </button>
-                                        <button class="btn btn-secondary" onclick="testActuator('${device.name}', 'STOP')">
-                                            <i class="bi bi-stop-fill"></i> ${t('device.stop', 'Stop')}
-                                        </button>
-                                        <button class="btn btn-danger" onclick="testActuator('${device.name}', 'CLOSE')">
-                                            <i class="bi bi-arrow-down"></i> ${t('device.close', 'Close')}
-                                        </button>
+                                        <button class="btn btn-success" onclick="testActuator('${device.name}','OPEN')"><i class="bi bi-arrow-up"></i> ${t('device.open','Open')}</button>
+                                        <button class="btn btn-secondary" onclick="testActuator('${device.name}','STOP')"><i class="bi bi-stop-fill"></i> ${t('device.stop','Stop')}</button>
+                                        <button class="btn btn-danger" onclick="testActuator('${device.name}','CLOSE')"><i class="bi bi-arrow-down"></i> ${t('device.close','Close')}</button>
                                     ` : `
-                                        <button class="btn btn-success" onclick="testActuator('${device.name}', 'ON')">
-                                            <i class="bi bi-power"></i> ${t('device.test_on', 'Test ON')}
-                                        </button>
-                                        <button class="btn btn-danger" onclick="testActuator('${device.name}', 'OFF')">
-                                            <i class="bi bi-power"></i> ${t('device.test_off', 'Test OFF')}
-                                        </button>
+                                        <button class="btn btn-success" onclick="testActuator('${device.name}','ON')"><i class="bi bi-power"></i> ${t('device.test_on','Test ON')}</button>
+                                        <button class="btn btn-danger" onclick="testActuator('${device.name}','OFF')"><i class="bi bi-power"></i> ${t('device.test_off','Test OFF')}</button>
                                     `}
                                     <span id="test-actuator-result" class="small"></span>
                                 </div>
                             </div>
-                        </div>
-                        ` : ''}
-
+                        </div>` : ''}
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <span><i class="bi bi-clock-history"></i> ${t('device.recent_telegrams', 'Recent Telegrams for')} ${device.name}</span>
-                                <small class="text-muted">${telegrams.length} ${t('device.telegrams_count', 'telegram(s)')}</small>
+                                <span><i class="bi bi-clock-history"></i> ${t('device.recent_telegrams','Recent Telegrams for')} ${device.name}</span>
+                                <small class="text-muted">${telegrams.length} ${t('device.telegrams_count','telegram(s)')}</small>
                             </div>
                             <div class="card-body" style="max-height: 400px; overflow-y: auto;">
                                 ${telegrams.length === 0
-                                    ? `<p class="text-muted">${t('device.no_telegrams', 'No telegrams received from this device yet')}</p>`
+                                    ? `<p class="text-muted">${t('device.no_telegrams','No telegrams received from this device yet')}</p>`
                                     : `<div class="table-responsive"><table class="table table-sm">
-                                        <thead><tr><th>${t('telegram.time', 'Time')}</th><th>${t('telegram.rorg', 'RORG')}</th><th>${t('telegram.data', 'Data')}</th><th>${t('telegram.dbm', 'dBm')}</th><th>${t('telegram.teach_in', 'Teach-In')}</th></tr></thead>
-                                        <tbody>
-                                            ${telegrams.map(tg => `
-                                                <tr>
-                                                    <td><small>${new Date(tg.timestamp).toLocaleTimeString()}</small></td>
-                                                    <td><span class="badge bg-secondary">${tg.rorg}</span></td>
-                                                    <td><code>${tg.data || '-'}</code></td>
-                                                    <td>${tg.dbm ? tg.dbm + ' dBm' : '<span class="text-muted">N/A</span>'}</td>
-                                                    <td>${tg.is_teach_in ? '<span class="badge bg-warning">Yes</span>' : '-'}</td>
-                                                </tr>
-                                            `).join('')}
-                                        </tbody>
+                                        <thead><tr><th>${t('telegram.time','Time')}</th><th>${t('telegram.rorg','RORG')}</th><th>${t('telegram.data','Data')}</th><th>${t('telegram.dbm','dBm')}</th><th>${t('telegram.teach_in','Teach-In')}</th></tr></thead>
+                                        <tbody>${telegrams.map(tg => `<tr>
+                                            <td><small>${new Date(tg.timestamp).toLocaleTimeString()}</small></td>
+                                            <td><span class="badge bg-secondary">${tg.rorg}</span></td>
+                                            <td><code>${tg.data || '-'}</code></td>
+                                            <td>${tg.dbm ? tg.dbm + ' dBm' : '<span class="text-muted">N/A</span>'}</td>
+                                            <td>${tg.is_teach_in ? '<span class="badge bg-warning">Yes</span>' : '-'}</td>
+                                        </tr>`).join('')}</tbody>
                                     </table></div>`
                                 }
                             </div>
                         </div>
-                    </div>
-                `;
-            } catch (error) {
-                showToast(t('device.details_failed', 'Failed to load device details'), 'danger');
-            }
+                    </div>`;
+            } catch (error) { showToast(t('device.details_failed', 'Failed to load device details'), 'danger'); }
         }
 
         async function deleteDevice(name) {
             if (!confirm(`${t('devices.delete_confirm', 'Delete device')} "${name}"?`)) return;
-
-            try {
-                await fetch(getApiUrl(`/api/devices/${name}`), {method: 'DELETE'});
-                loadDevices();
-                showToast(t('devices.deleted', 'Device deleted'), 'success');
-            } catch (error) {
-                showToast(t('devices.delete_failed', 'Failed to delete device'), 'danger');
-            }
+            try { await fetch(getApiUrl(`/api/devices/${name}`), {method: 'DELETE'}); loadDevices(); showToast(t('devices.deleted', 'Device deleted'), 'success'); }
+            catch (error) { showToast(t('devices.delete_failed', 'Failed to delete device'), 'danger'); }
         }
 
         async function exportConfig() {
@@ -2755,48 +2515,29 @@
                 a.href = url;
                 const disposition = response.headers.get('Content-Disposition');
                 a.download = disposition ? disposition.split('filename=')[1] : 'enocean_config.zip';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 showToast(t('export.success', 'Config exported successfully'), 'success');
-            } catch (error) {
-                showToast(t('export.failed', 'Export failed') + ': ' + error.message, 'danger');
-            }
+            } catch (error) { showToast(t('export.failed', 'Export failed') + ': ' + error.message, 'danger'); }
         }
 
         async function importConfig(input) {
             if (!input.files.length) return;
-
             const formData = new FormData();
             formData.append('file', input.files[0]);
-
             try {
-                const response = await fetch(getApiUrl('/api/system/import'), {
-                    method: 'POST',
-                    body: formData
-                });
+                const response = await fetch(getApiUrl('/api/system/import'), { method: 'POST', body: formData });
                 const result = await response.json();
-                showToast(`${t('settings.import_success', 'Import successful')}: ${result.details.devices ? 'devices, ' : ''}${result.details.mappings ? 'mappings, ' : ''}${result.details.custom_profiles} custom profiles`, 'success');
+                showToast(`${t('settings.import_success','Import successful')}: ${result.details.devices ? 'devices, ' : ''}${result.details.mappings ? 'mappings, ' : ''}${result.details.custom_profiles} custom profiles`, 'success');
                 loadStatus();
-            } catch (error) {
-                showToast(t('settings.import_failed', 'Import failed'), 'danger');
-            }
+            } catch (error) { showToast(t('settings.import_failed', 'Import failed'), 'danger'); }
         }
 
         async function restartServices() {
             if (!confirm(t('settings.restart_confirm', 'Restart EnOcean and MQTT services?'))) return;
-
-            try {
-                await fetch(getApiUrl('/api/system/restart'), {method: 'POST'});
-                showToast(t('settings.restarting', 'Services restarting...'), 'info');
-                setTimeout(loadStatus, 3000);
-            } catch (error) {
-                showToast(t('settings.restart_failed', 'Restart failed'), 'danger');
-            }
+            try { await fetch(getApiUrl('/api/system/restart'), {method: 'POST'}); showToast(t('settings.restarting','Services restarting...'), 'info'); setTimeout(loadStatus, 3000); }
+            catch (error) { showToast(t('settings.restart_failed', 'Restart failed'), 'danger'); }
         }
-
-        // ===== Confirmation Modal =====
 
         let _pendingConfirmAction = null;
 
@@ -2804,31 +2545,22 @@
             document.getElementById('confirmModalTitle').textContent = title;
             document.getElementById('confirmModalBody').innerHTML = body;
             const btn = document.getElementById('confirmModalAction');
-            btn.textContent = btnLabel;
-            btn.className = 'btn ' + btnClass;
+            btn.textContent = btnLabel; btn.className = 'btn ' + btnClass;
             _pendingConfirmAction = action;
             new bootstrap.Modal(document.getElementById('confirmModal')).show();
         }
 
         async function executeConfirmedAction() {
             bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
-            if (_pendingConfirmAction) {
-                await _pendingConfirmAction();
-                _pendingConfirmAction = null;
-            }
+            if (_pendingConfirmAction) { await _pendingConfirmAction(); _pendingConfirmAction = null; }
         }
-
-        // ===== Backup Management =====
 
         async function loadBackups() {
             try {
                 const response = await fetch(getApiUrl('/api/system/backups'));
                 const backups = await response.json();
                 renderBackupList(backups);
-            } catch (error) {
-                document.getElementById('backup-list').innerHTML =
-                    `<p class="text-danger">${t('backup.load_failed', 'Failed to load backups')}</p>`;
-            }
+            } catch (error) { document.getElementById('backup-list').innerHTML = `<p class="text-danger">${t('backup.load_failed','Failed to load backups')}</p>`; }
         }
 
         function formatFileSize(bytes) {
@@ -2839,126 +2571,75 @@
 
         function renderBackupList(backups) {
             const container = document.getElementById('backup-list');
-
-            if (backups.length === 0) {
-                container.innerHTML = `<p class="text-muted">${t('backup.no_backups', 'No backups yet. Click "Create Backup" to save your current configuration.')}</p>`;
-                return;
-            }
-
-            container.innerHTML = `
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>${t('backup.filename', 'Filename')}</th>
-                                <th>${t('backup.created', 'Created')}</th>
-                                <th>${t('backup.size', 'Size')}</th>
-                                <th>${t('backup.devices', 'Devices')}</th>
-                                <th>${t('backup.version', 'Version')}</th>
-                                <th class="text-end">${t('backup.actions', 'Actions')}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${backups.map(b => `
-                                <tr>
-                                    <td><code class="small">${b.filename}</code></td>
-                                    <td><small>${new Date(b.created_at).toLocaleString()}</small></td>
-                                    <td><small>${formatFileSize(b.size)}</small></td>
-                                    <td><small>${b.devices}</small></td>
-                                    <td><small>${b.version}</small></td>
-                                    <td class="text-end text-nowrap">
-                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="downloadBackup('${b.filename}')" title="${t('backup.download', 'Download')}">
-                                            <i class="bi bi-download"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-warning me-1" onclick="confirmRestoreBackup('${b.filename}')" title="${t('backup.restore', 'Restore')}">
-                                            <i class="bi bi-arrow-counterclockwise"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBackup('${b.filename}')" title="${t('backup.delete', 'Delete')}">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
+            if (backups.length === 0) { container.innerHTML = `<p class="text-muted">${t('backup.no_backups','No backups yet. Click "Create Backup" to save your current configuration.')}</p>`; return; }
+            container.innerHTML = `<div class="table-responsive"><table class="table table-sm table-hover mb-0">
+                <thead><tr><th>${t('backup.filename','Filename')}</th><th>${t('backup.created','Created')}</th><th>${t('backup.size','Size')}</th><th>${t('backup.devices','Devices')}</th><th>${t('backup.version','Version')}</th><th class="text-end">${t('backup.actions','Actions')}</th></tr></thead>
+                <tbody>${backups.map(b => `<tr>
+                    <td><code class="small">${b.filename}</code></td>
+                    <td><small>${new Date(b.created_at).toLocaleString()}</small></td>
+                    <td><small>${formatFileSize(b.size)}</small></td>
+                    <td><small>${b.devices}</small></td>
+                    <td><small>${b.version}</small></td>
+                    <td class="text-end text-nowrap">
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="downloadBackup('${b.filename}')" title="${t('backup.download','Download')}"><i class="bi bi-download"></i></button>
+                        <button class="btn btn-sm btn-outline-warning me-1" onclick="confirmRestoreBackup('${b.filename}')" title="${t('backup.restore','Restore')}"><i class="bi bi-arrow-counterclockwise"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteBackup('${b.filename}')" title="${t('backup.delete','Delete')}"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>`).join('')}</tbody>
+            </table></div>`;
         }
 
         async function createBackup() {
             try {
-                showToast(t('backup.creating', 'Creating backup...'), 'info');
+                showToast(t('backup.creating','Creating backup...'), 'info');
                 const response = await fetch(getApiUrl('/api/system/backup'), {method: 'POST'});
-                if (!response.ok) throw new Error(t('backup.failed', 'Backup failed'));
+                if (!response.ok) throw new Error(t('backup.failed','Backup failed'));
                 const result = await response.json();
-                showToast(`${t('backup.created_success', 'Backup created')}: ${result.filename}`, 'success');
+                showToast(`${t('backup.created_success','Backup created')}: ${result.filename}`, 'success');
                 loadBackups();
-            } catch (error) {
-                showToast(t('backup.failed', 'Backup failed') + ': ' + error.message, 'danger');
-            }
+            } catch (error) { showToast(t('backup.failed','Backup failed') + ': ' + error.message, 'danger'); }
         }
 
         function downloadBackup(filename) {
             const a = document.createElement('a');
             a.href = getApiUrl(`/api/system/backup/download/${filename}`);
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
         function confirmRestoreBackup(filename) {
             showConfirmDialog(
-                t('backup.restore_title', 'Restore Backup'),
-                `<p>${t('backup.restore_confirm', 'Are you sure you want to restore from:')}</p>
-                 <p><strong><code>${filename}</code></strong></p>
-                 <p class="text-warning mb-0"><i class="bi bi-exclamation-triangle"></i>
-                 ${t('backup.restore_warning', 'This will overwrite your current devices, mappings, and custom profiles.')}</p>`,
-                t('backup.restore', 'Restore'),
-                'btn-warning',
+                t('backup.restore_title','Restore Backup'),
+                `<p>${t('backup.restore_confirm','Are you sure you want to restore from:')}</p><p><strong><code>${filename}</code></strong></p>
+                 <p class="text-warning mb-0"><i class="bi bi-exclamation-triangle"></i> ${t('backup.restore_warning','This will overwrite your current devices, mappings, and custom profiles.')}</p>`,
+                t('backup.restore','Restore'), 'btn-warning',
                 async () => {
                     try {
-                        showToast(t('backup.restoring', 'Restoring backup...'), 'info');
+                        showToast(t('backup.restoring','Restoring backup...'), 'info');
                         const response = await fetch(getApiUrl(`/api/system/backup/restore/${filename}`), {method: 'POST'});
-                        if (!response.ok) {
-                            const err = await response.json().catch(() => null);
-                            throw new Error(err?.detail || t('backup.restore_failed', 'Restore failed'));
-                        }
+                        if (!response.ok) { const err = await response.json().catch(() => null); throw new Error(err?.detail || t('backup.restore_failed','Restore failed')); }
                         const result = await response.json();
-                        showToast(`${t('backup.restored', 'Backup restored')}: ${result.details.devices ? t('nav.devices', 'devices') + ', ' : ''}${result.details.mappings ? t('nav.mappings', 'mappings') + ', ' : ''}${result.details.custom_profiles} ${t('backup.custom_profiles', 'custom profiles')}`, 'success');
-                        loadStatus();
-                        loadDevices();
-                        loadProfiles();
-                    } catch (error) {
-                        showToast(t('backup.restore_failed', 'Restore failed') + ': ' + error.message, 'danger');
-                    }
+                        showToast(`${t('backup.restored','Backup restored')}: ${result.details.devices ? t('nav.devices','devices') + ', ' : ''}${result.details.mappings ? t('nav.mappings','mappings') + ', ' : ''}${result.details.custom_profiles} ${t('backup.custom_profiles','custom profiles')}`, 'success');
+                        loadStatus(); loadDevices(); loadProfiles();
+                    } catch (error) { showToast(t('backup.restore_failed','Restore failed') + ': ' + error.message, 'danger'); }
                 }
             );
         }
 
         function confirmDeleteBackup(filename) {
             showConfirmDialog(
-                t('backup.delete_title', 'Delete Backup'),
-                `<p>${t('backup.delete_confirm', 'Are you sure you want to delete:')}</p>
-                 <p><strong><code>${filename}</code></strong></p>
-                 <p class="text-danger mb-0"><i class="bi bi-exclamation-triangle"></i>
-                 ${t('backup.delete_warning', 'This cannot be undone.')}</p>`,
-                t('backup.delete', 'Delete'),
-                'btn-danger',
+                t('backup.delete_title','Delete Backup'),
+                `<p>${t('backup.delete_confirm','Are you sure you want to delete:')}</p><p><strong><code>${filename}</code></strong></p>
+                 <p class="text-danger mb-0"><i class="bi bi-exclamation-triangle"></i> ${t('backup.delete_warning','This cannot be undone.')}</p>`,
+                t('backup.delete','Delete'), 'btn-danger',
                 async () => {
                     try {
                         const response = await fetch(getApiUrl(`/api/system/backup/${filename}`), {method: 'DELETE'});
-                        if (!response.ok) throw new Error(t('backup.delete_failed', 'Delete failed'));
-                        showToast(t('backup.deleted', 'Backup deleted'), 'success');
-                        loadBackups();
-                    } catch (error) {
-                        showToast(t('backup.delete_failed', 'Delete failed') + ': ' + error.message, 'danger');
-                    }
+                        if (!response.ok) throw new Error(t('backup.delete_failed','Delete failed'));
+                        showToast(t('backup.deleted','Backup deleted'), 'success'); loadBackups();
+                    } catch (error) { showToast(t('backup.delete_failed','Delete failed') + ': ' + error.message, 'danger'); }
                 }
             );
         }
-
-        // ===== HA Mapping Builder =====
 
         let _haRowCounter = 0;
 
@@ -2966,330 +2647,174 @@
             const container = document.getElementById('ha-mapping-rows');
             const emptyMsg = document.getElementById('ha-mapping-empty');
             if (emptyMsg) emptyMsg.style.display = 'none';
-
             const rowId = _haRowCounter++;
-            const stateClass = opts.state_class || '';
-            const entityCategory = opts.entity_category || '';
-            const expireAfter = opts.expire_after != null ? opts.expire_after : '';
-            const forceUpdate = opts.force_update || false;
-            const precision = opts.suggested_display_precision != null ? opts.suggested_display_precision : '';
-            const valueTemplate = opts.value_template || '';
-
+            const stateClass = opts.state_class || '', entityCategory = opts.entity_category || '',
+                  expireAfter = opts.expire_after != null ? opts.expire_after : '',
+                  forceUpdate = opts.force_update || false,
+                  precision = opts.suggested_display_precision != null ? opts.suggested_display_precision : '',
+                  valueTemplate = opts.value_template || '';
             const row = document.createElement('div');
             row.className = 'ha-mapping-row border rounded p-2 mb-2';
             row.innerHTML = `
                 <div class="row g-2 align-items-end">
-                    <div class="col-md-2">
-                        <label class="form-label small">${t('mapping_editor.field_shortcut', 'Shortcut')}</label>
-                        <input type="text" class="form-control form-control-sm" placeholder="AL" value="${shortcut}"
-                               data-field="shortcut">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small">${t('mapping_editor.field_component', 'Component')}</label>
+                    <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_shortcut','Shortcut')}</label>
+                        <input type="text" class="form-control form-control-sm" placeholder="AL" value="${shortcut}" data-field="shortcut"></div>
+                    <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_component','Component')}</label>
                         <select class="form-select form-select-sm" data-field="component" onchange="onComponentChange(this)">
-                            <option value="binary_sensor" ${component === 'binary_sensor' ? 'selected' : ''}>binary_sensor</option>
-                            <option value="sensor" ${component === 'sensor' ? 'selected' : ''}>sensor</option>
-                            <option value="switch" ${component === 'switch' ? 'selected' : ''}>switch</option>
-                            <option value="light" ${component === 'light' ? 'selected' : ''}>light</option>
-                            <option value="cover" ${component === 'cover' ? 'selected' : ''}>cover</option>
-                            <option value="climate" ${component === 'climate' ? 'selected' : ''}>climate</option>
-                            <option value="fan" ${component === 'fan' ? 'selected' : ''}>fan</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small">${t('mapping_editor.field_name', 'Name')}</label>
-                        <input type="text" class="form-control form-control-sm" placeholder="Alarm" value="${name}"
-                               data-field="name">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small">${t('mapping_editor.field_device_class', 'Device Class')}</label>
-                        <select class="form-select form-select-sm" data-field="device_class">
-                            ${getDeviceClassOptions(component, deviceClass)}
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small">${t('mapping_editor.field_icon', 'Icon')}</label>
-                        <input type="text" class="form-control form-control-sm" placeholder="mdi:alert" value="${icon}"
-                               data-field="icon">
-                    </div>
-                    <div class="col-md-1">
-                        <label class="form-label small">${t('mapping_editor.field_unit', 'Unit')}</label>
-                        <input type="text" class="form-control form-control-sm" placeholder="" value="${unit}"
-                               data-field="unit_of_measurement">
-                    </div>
-                    <div class="col-md-1">
-                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHaMappingRow(this)" title="${t('mapping_editor.field_remove', 'Remove')}">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
+                            <option value="binary_sensor" ${component==='binary_sensor'?'selected':''}>binary_sensor</option>
+                            <option value="sensor" ${component==='sensor'?'selected':''}>sensor</option>
+                            <option value="switch" ${component==='switch'?'selected':''}>switch</option>
+                            <option value="light" ${component==='light'?'selected':''}>light</option>
+                            <option value="cover" ${component==='cover'?'selected':''}>cover</option>
+                            <option value="climate" ${component==='climate'?'selected':''}>climate</option>
+                            <option value="fan" ${component==='fan'?'selected':''}>fan</option>
+                        </select></div>
+                    <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_name','Name')}</label>
+                        <input type="text" class="form-control form-control-sm" placeholder="Alarm" value="${name}" data-field="name"></div>
+                    <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_device_class','Device Class')}</label>
+                        <select class="form-select form-select-sm" data-field="device_class">${getDeviceClassOptions(component, deviceClass)}</select></div>
+                    <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_icon','Icon')}</label>
+                        <input type="text" class="form-control form-control-sm" placeholder="mdi:alert" value="${icon}" data-field="icon"></div>
+                    <div class="col-md-1"><label class="form-label small">${t('mapping_editor.field_unit','Unit')}</label>
+                        <input type="text" class="form-control form-control-sm" value="${unit}" data-field="unit_of_measurement"></div>
+                    <div class="col-md-1"><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHaMappingRow(this)"><i class="bi bi-trash"></i></button></div>
                 </div>
                 <div class="mt-1">
                     <a class="small text-muted text-decoration-none" data-bs-toggle="collapse" href="#ha-adv-${rowId}" role="button" aria-expanded="false">
-                        <i class="bi bi-chevron-right"></i> ${t('mapping_editor.advanced', 'Advanced')}
+                        <i class="bi bi-chevron-right"></i> ${t('mapping_editor.advanced','Advanced')}
                     </a>
                     <div class="collapse" id="ha-adv-${rowId}">
                         <div class="row g-2 mt-1">
-                            <div class="col-md-2">
-                                <label class="form-label small">${t('mapping_editor.field_state_class', 'State Class')}</label>
+                            <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_state_class','State Class')}</label>
                                 <select class="form-select form-select-sm" data-field="state_class">
-                                    <option value="" ${!stateClass ? 'selected' : ''}>${t('mapping_editor.none', '(none)')}</option>
-                                    <option value="measurement" ${stateClass === 'measurement' ? 'selected' : ''}>measurement</option>
-                                    <option value="total" ${stateClass === 'total' ? 'selected' : ''}>total</option>
-                                    <option value="total_increasing" ${stateClass === 'total_increasing' ? 'selected' : ''}>total_increasing</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small">${t('mapping_editor.field_entity_category', 'Entity Category')}</label>
+                                    <option value="" ${!stateClass?'selected':''}>${t('mapping_editor.none','(none)')}</option>
+                                    <option value="measurement" ${stateClass==='measurement'?'selected':''}>measurement</option>
+                                    <option value="total" ${stateClass==='total'?'selected':''}>total</option>
+                                    <option value="total_increasing" ${stateClass==='total_increasing'?'selected':''}>total_increasing</option>
+                                </select></div>
+                            <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_entity_category','Entity Category')}</label>
                                 <select class="form-select form-select-sm" data-field="entity_category">
-                                    <option value="" ${!entityCategory ? 'selected' : ''}>${t('mapping_editor.none', '(none)')}</option>
-                                    <option value="diagnostic" ${entityCategory === 'diagnostic' ? 'selected' : ''}>diagnostic</option>
-                                    <option value="config" ${entityCategory === 'config' ? 'selected' : ''}>config</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small">${t('mapping_editor.field_expire_after', 'Expire After (s)')}</label>
-                                <input type="number" class="form-control form-control-sm" placeholder="" value="${expireAfter}" data-field="expire_after" min="0">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small">${t('mapping_editor.field_precision', 'Precision')}</label>
-                                <input type="number" class="form-control form-control-sm" placeholder="" value="${precision}" data-field="suggested_display_precision" min="0" max="10">
-                            </div>
+                                    <option value="" ${!entityCategory?'selected':''}>${t('mapping_editor.none','(none)')}</option>
+                                    <option value="diagnostic" ${entityCategory==='diagnostic'?'selected':''}>diagnostic</option>
+                                    <option value="config" ${entityCategory==='config'?'selected':''}>config</option>
+                                </select></div>
+                            <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_expire_after','Expire After (s)')}</label>
+                                <input type="number" class="form-control form-control-sm" value="${expireAfter}" data-field="expire_after" min="0"></div>
+                            <div class="col-md-2"><label class="form-label small">${t('mapping_editor.field_precision','Precision')}</label>
+                                <input type="number" class="form-control form-control-sm" value="${precision}" data-field="suggested_display_precision" min="0" max="10"></div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" data-field="force_update" ${forceUpdate ? 'checked' : ''}>
-                                    <label class="form-check-label small">${t('mapping_editor.field_force_update', 'Force Update')}</label>
-                                </div>
-                            </div>
+                                    <input class="form-check-input" type="checkbox" data-field="force_update" ${forceUpdate?'checked':''}>
+                                    <label class="form-check-label small">${t('mapping_editor.field_force_update','Force Update')}</label>
+                                </div></div>
                         </div>
                         <div class="row g-2 mt-1">
-                            <div class="col-md-6">
-                                <label class="form-label small">${t('mapping_editor.field_value_template', 'Value Template')}</label>
-                                <input type="text" class="form-control form-control-sm font-monospace" placeholder="auto-generated" value="${valueTemplate.replace(/"/g, '&quot;')}" data-field="value_template">
-                            </div>
+                            <div class="col-md-6"><label class="form-label small">${t('mapping_editor.field_value_template','Value Template')}</label>
+                                <input type="text" class="form-control form-control-sm font-monospace" placeholder="auto-generated" value="${valueTemplate.replace(/"/g,'&quot;')}" data-field="value_template"></div>
                         </div>
                     </div>
-                </div>
-            `;
-
-            // Rotate chevron on collapse toggle
+                </div>`;
             const collapseEl = row.querySelector('.collapse');
-            collapseEl.addEventListener('show.bs.collapse', () => {
-                row.querySelector('.bi-chevron-right')?.classList.replace('bi-chevron-right', 'bi-chevron-down');
-            });
-            collapseEl.addEventListener('hide.bs.collapse', () => {
-                row.querySelector('.bi-chevron-down')?.classList.replace('bi-chevron-down', 'bi-chevron-right');
-            });
-
+            collapseEl.addEventListener('show.bs.collapse', () => row.querySelector('.bi-chevron-right')?.classList.replace('bi-chevron-right','bi-chevron-down'));
+            collapseEl.addEventListener('hide.bs.collapse', () => row.querySelector('.bi-chevron-down')?.classList.replace('bi-chevron-down','bi-chevron-right'));
             container.appendChild(row);
         }
 
         function removeHaMappingRow(btn) {
-            const row = btn.closest('.ha-mapping-row');
-            row.remove();
-            const container = document.getElementById('ha-mapping-rows');
-            if (container.children.length === 0) {
+            btn.closest('.ha-mapping-row').remove();
+            if (document.getElementById('ha-mapping-rows').children.length === 0)
                 document.getElementById('ha-mapping-empty').style.display = '';
-            }
         }
 
         function onComponentChange(select) {
-            const row = select.closest('.ha-mapping-row');
-            const dcSelect = row.querySelector('[data-field="device_class"]');
-            const component = select.value;
-            dcSelect.innerHTML = getDeviceClassOptions(component, '');
+            select.closest('.ha-mapping-row').querySelector('[data-field="device_class"]').innerHTML = getDeviceClassOptions(select.value, '');
         }
 
         function getDeviceClassOptions(component, selected) {
             const classes = {
-                'binary_sensor': ['', 'battery', 'cold', 'door', 'garage_door', 'gas', 'heat', 'moisture', 'motion', 'moving', 'occupancy', 'opening', 'plug', 'power', 'problem', 'safety', 'smoke', 'sound', 'vibration', 'window'],
-                'sensor': ['', 'battery', 'current', 'energy', 'humidity', 'illuminance', 'power', 'pressure', 'signal_strength', 'temperature', 'timestamp', 'voltage'],
-                'cover': ['', 'awning', 'blind', 'curtain', 'garage', 'gate', 'shade', 'shutter', 'window'],
-                'switch': ['', 'outlet', 'switch'],
-                'light': [''],
-                'climate': [''],
-                'fan': ['']
+                'binary_sensor': ['','battery','cold','door','garage_door','gas','heat','moisture','motion','moving','occupancy','opening','plug','power','problem','safety','smoke','sound','vibration','window'],
+                'sensor': ['','battery','current','energy','humidity','illuminance','power','pressure','signal_strength','temperature','timestamp','voltage'],
+                'cover': ['','awning','blind','curtain','garage','gate','shade','shutter','window'],
+                'switch': ['','outlet','switch'], 'light': [''], 'climate': [''], 'fan': ['']
             };
-            const options = classes[component] || [''];
-            return options.map(c =>
-                `<option value="${c}" ${c === selected ? 'selected' : ''}>${c || '(none)'}</option>`
-            ).join('');
+            return (classes[component] || ['']).map(c => `<option value="${c}" ${c===selected?'selected':''}>${c||'(none)'}</option>`).join('');
         }
 
         function collectHaMapping() {
             const rows = document.querySelectorAll('.ha-mapping-row');
             if (rows.length === 0) return null;
-
-            const mapping = {};
-            let valid = true;
-
+            const mapping = {}; let valid = true;
             rows.forEach(row => {
                 const shortcut = (row.querySelector('[data-field="shortcut"]').value || '').trim();
-                if (!shortcut) {
-                    valid = false;
-                    return;
-                }
-
-                const entry = {
-                    component: row.querySelector('[data-field="component"]').value
-                };
-
-                const name = row.querySelector('[data-field="name"]').value.trim();
-                if (name) entry.name = name;
-
-                const dc = row.querySelector('[data-field="device_class"]').value;
-                if (dc) entry.device_class = dc;
-
-                const icon = row.querySelector('[data-field="icon"]').value.trim();
-                if (icon) entry.icon = icon;
-
-                const unit = row.querySelector('[data-field="unit_of_measurement"]').value.trim();
-                if (unit) entry.unit_of_measurement = unit;
-
-                // Advanced fields
-                const stateClass = row.querySelector('[data-field="state_class"]')?.value || '';
-                if (stateClass) entry.state_class = stateClass;
-                const entityCat = row.querySelector('[data-field="entity_category"]')?.value || '';
-                if (entityCat) entry.entity_category = entityCat;
-                const expireStr = row.querySelector('[data-field="expire_after"]')?.value || '';
-                if (expireStr !== '') entry.expire_after = parseInt(expireStr);
-                const precisionStr = row.querySelector('[data-field="suggested_display_precision"]')?.value || '';
-                if (precisionStr !== '') entry.suggested_display_precision = parseInt(precisionStr);
-                const forceUpdate = row.querySelector('[data-field="force_update"]')?.checked || false;
-                if (forceUpdate) entry.force_update = true;
-                const valTpl = row.querySelector('[data-field="value_template"]')?.value?.trim() || '';
-                if (valTpl) entry.value_template = valTpl;
-
+                if (!shortcut) { valid = false; return; }
+                const entry = { component: row.querySelector('[data-field="component"]').value };
+                const name = row.querySelector('[data-field="name"]').value.trim(); if (name) entry.name = name;
+                const dc = row.querySelector('[data-field="device_class"]').value; if (dc) entry.device_class = dc;
+                const icon = row.querySelector('[data-field="icon"]').value.trim(); if (icon) entry.icon = icon;
+                const unit = row.querySelector('[data-field="unit_of_measurement"]').value.trim(); if (unit) entry.unit_of_measurement = unit;
+                const stateClass = row.querySelector('[data-field="state_class"]')?.value || ''; if (stateClass) entry.state_class = stateClass;
+                const entityCat = row.querySelector('[data-field="entity_category"]')?.value || ''; if (entityCat) entry.entity_category = entityCat;
+                const expireStr = row.querySelector('[data-field="expire_after"]')?.value || ''; if (expireStr !== '') entry.expire_after = parseInt(expireStr);
+                const precisionStr = row.querySelector('[data-field="suggested_display_precision"]')?.value || ''; if (precisionStr !== '') entry.suggested_display_precision = parseInt(precisionStr);
+                const forceUpdate = row.querySelector('[data-field="force_update"]')?.checked || false; if (forceUpdate) entry.force_update = true;
+                const valTpl = row.querySelector('[data-field="value_template"]')?.value?.trim() || ''; if (valTpl) entry.value_template = valTpl;
                 mapping[shortcut] = entry;
             });
-
-            if (!valid) return undefined; // signal validation error
+            if (!valid) return undefined;
             return Object.keys(mapping).length > 0 ? mapping : null;
         }
 
         function populateHaMapping(haMapping) {
             const container = document.getElementById('ha-mapping-rows');
             container.innerHTML = '';
-
-            if (!haMapping || Object.keys(haMapping).length === 0) {
-                document.getElementById('ha-mapping-empty').style.display = '';
-                return;
-            }
-
+            if (!haMapping || Object.keys(haMapping).length === 0) { document.getElementById('ha-mapping-empty').style.display = ''; return; }
             document.getElementById('ha-mapping-empty').style.display = 'none';
-
             for (const [shortcut, config] of Object.entries(haMapping)) {
-                addHaMappingRow(
-                    shortcut,
-                    config.component || 'binary_sensor',
-                    config.name || '',
-                    config.device_class || '',
-                    config.icon || '',
-                    config.unit_of_measurement || '',
-                    {
-                        state_class: config.state_class,
-                        entity_category: config.entity_category,
-                        expire_after: config.expire_after,
-                        force_update: config.force_update,
-                        suggested_display_precision: config.suggested_display_precision,
-                        value_template: config.value_template
-                    }
-                );
+                addHaMappingRow(shortcut, config.component || 'binary_sensor', config.name || '', config.device_class || '', config.icon || '', config.unit_of_measurement || '', {
+                    state_class: config.state_class, entity_category: config.entity_category,
+                    expire_after: config.expire_after, force_update: config.force_update,
+                    suggested_display_precision: config.suggested_display_precision, value_template: config.value_template
+                });
             }
         }
-
-        // ===== Save/Edit Custom Profile =====
 
         async function saveCustomProfile() {
             const form = document.getElementById('custom-profile-form');
             const formData = new FormData(form);
-
-            // Validate required fields (HTML 'required' doesn't work with onclick)
-            const rorg = (formData.get('rorg') || '').trim();
-            const func = (formData.get('func') || '').trim();
-            const type = (formData.get('type') || '').trim();
-            const description = (formData.get('description') || '').trim();
-
-            if (!rorg || !func || !type) {
-                showToast(t('toast.rorg_func_type_required', 'RORG, FUNC, and TYPE are required'), 'danger');
-                return;
-            }
-            if (!description) {
-                showToast(t('toast.description_required', 'Description is required'), 'danger');
-                return;
-            }
-
+            const rorg = (formData.get('rorg') || '').trim(), func = (formData.get('func') || '').trim(),
+                  type = (formData.get('type') || '').trim(), description = (formData.get('description') || '').trim();
+            if (!rorg || !func || !type) { showToast(t('toast.rorg_func_type_required','RORG, FUNC, and TYPE are required'), 'danger'); return; }
+            if (!description) { showToast(t('toast.description_required','Description is required'), 'danger'); return; }
             try {
                 let fields = [];
                 const fieldsText = (formData.get('fields') || '').trim();
                 if (fieldsText) {
                     fields = JSON.parse(fieldsText);
-                    if (!Array.isArray(fields)) {
-                        showToast(t('toast.fields_json_array', 'Fields must be a JSON array'), 'danger');
-                        return;
-                    }
+                    if (!Array.isArray(fields)) { showToast(t('toast.fields_json_array','Fields must be a JSON array'), 'danger'); return; }
                 }
-
-                // Collect HA mapping from builder (visual or text mode)
                 const haMapping = getHaMappingData();
-                if (haMapping === undefined) {
-                    showToast(t('mapping_editor.ha_need_shortcut', 'HA Mapping: All rows need a Shortcut (or fix YAML errors)'), 'danger');
-                    return;
-                }
-
-                // Check if we're editing or creating
+                if (haMapping === undefined) { showToast(t('mapping_editor.ha_need_shortcut','HA Mapping: All rows need a Shortcut (or fix YAML errors)'), 'danger'); return; }
                 const editEepId = form.dataset.editEepId;
-                const url = editEepId
-                    ? getApiUrl(`/api/eep/custom/${editEepId}`)
-                    : getApiUrl('/api/eep/custom');
+                const url = editEepId ? getApiUrl(`/api/eep/custom/${editEepId}`) : getApiUrl('/api/eep/custom');
                 const method = editEepId ? 'PUT' : 'POST';
-
-                const payload = {
-                    rorg: rorg,
-                    func: func,
-                    type: type,
-                    description: description,
-                    fields: fields
-                };
-                if (haMapping) {
-                    payload.ha_mapping = haMapping;
-                }
-
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const errData = await response.json().catch(() => null);
-                    const detail = errData?.detail || `Server error (${response.status})`;
-                    throw new Error(detail);
-                }
-
+                const payload = { rorg, func, type, description, fields };
+                if (haMapping) payload.ha_mapping = haMapping;
+                const response = await fetch(url, { method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+                if (!response.ok) { const errData = await response.json().catch(() => null); throw new Error(errData?.detail || `Server error (${response.status})`); }
                 bootstrap.Modal.getInstance(document.getElementById('customProfileModal')).hide();
-                form.reset();
-                delete form.dataset.editEepId;
-                document.querySelector('#customProfileModal .modal-title').textContent = t('modal.custom_profile_title', 'Create Custom EEP Profile');
-                // Clear HA mapping rows
-                document.getElementById('ha-mapping-rows').innerHTML = '';
-                document.getElementById('ha-mapping-empty').style.display = '';
-                loadProfiles();
-                showToast(editEepId ? t('modal.profile_updated', 'Custom profile updated') : t('modal.profile_saved', 'Custom profile created'), 'success');
-                // Show the profile details (use editEepId for updates, compute from form for new)
+                form.reset(); delete form.dataset.editEepId;
+                document.querySelector('#customProfileModal .modal-title').textContent = t('modal.custom_profile_title','Create Custom EEP Profile');
+                document.getElementById('ha-mapping-rows').innerHTML = ''; document.getElementById('ha-mapping-empty').style.display = '';
+                loadProfiles(); showToast(editEepId ? t('modal.profile_updated','Custom profile updated') : t('modal.profile_saved','Custom profile created'), 'success');
                 const showEepId = editEepId || `${rorg.toUpperCase().replace('0X','')}-${func.toUpperCase().replace('0X','').padStart(2,'0')}-${type.toUpperCase().replace('0X','').padStart(2,'0')}`;
                 showProfileDetails(showEepId);
-            } catch (error) {
-                showToast(error.message, 'danger');
-            }
+            } catch (error) { showToast(error.message, 'danger'); }
         }
 
         function filterDevices() {
             const query = document.getElementById('device-search').value.toLowerCase();
-            const cards = document.querySelectorAll('#device-list > .col-md-4');
-
-            cards.forEach(card => {
-                const text = card.dataset.search || card.textContent.toLowerCase();
-                card.style.display = text.includes(query) ? '' : 'none';
+            document.querySelectorAll('#device-list > .col-md-4').forEach(card => {
+                card.style.display = (card.dataset.search || card.textContent.toLowerCase()).includes(query) ? '' : 'none';
             });
         }
 
@@ -3297,36 +2822,19 @@
             const query = document.getElementById('profile-search').value.toLowerCase();
             const container = document.getElementById('eep-tree');
             const allItems = container.querySelectorAll('.eep-item');
-
             if (!query) {
-                // Reset: show all elements, then re-collapse standard tree nodes
                 container.querySelectorAll('*').forEach(el => el.style.display = '');
-                container.querySelectorAll('[id^="rorg-"], [id^="func-"]').forEach(el => {
-                    el.style.display = 'none';
-                });
+                container.querySelectorAll('[id^="rorg-"], [id^="func-"]').forEach(el => el.style.display = 'none');
                 return;
             }
-
-            // Hide everything inside the container first
             Array.from(container.children).forEach(child => child.style.display = 'none');
             allItems.forEach(item => item.style.display = 'none');
-            container.querySelectorAll('[id^="rorg-"], [id^="func-"]').forEach(el => {
-                el.style.display = 'none';
-            });
-
-            // Show matching items and expand their parent chain
-            let matchCount = 0;
+            container.querySelectorAll('[id^="rorg-"], [id^="func-"]').forEach(el => el.style.display = 'none');
             allItems.forEach(item => {
-                const text = item.dataset.search || item.textContent.toLowerCase();
-                if (text.includes(query)) {
-                    matchCount++;
+                if ((item.dataset.search || item.textContent.toLowerCase()).includes(query)) {
                     item.style.display = '';
-                    // Walk up and show all ancestor nodes up to the container
                     let parent = item.parentElement;
-                    while (parent && parent !== container) {
-                        parent.style.display = '';
-                        parent = parent.parentElement;
-                    }
+                    while (parent && parent !== container) { parent.style.display = ''; parent = parent.parentElement; }
                 }
             });
         }
@@ -3335,174 +2843,94 @@
             try {
                 const response = await fetch(getApiUrl('/api/gateway/recent-telegrams?limit=10'));
                 const telegrams = await response.json();
-
                 const container = document.getElementById('recent-activity');
-
-                if (telegrams.length === 0) {
-                    container.innerHTML = `<p class="text-muted">${t('dashboard.no_telegrams', 'No telegrams received yet')}</p>`;
-                    return;
-                }
-
+                if (telegrams.length === 0) { container.innerHTML = `<p class="text-muted">${t('dashboard.no_telegrams','No telegrams received yet')}</p>`; return; }
                 container.innerHTML = telegrams.map(tg => `
                     <div class="d-flex justify-content-between align-items-center border-bottom py-2">
                         <div>
-                            <strong>${tg.device_name || t('common.unknown', 'Unknown')}</strong>
+                            <strong>${tg.device_name || t('common.unknown','Unknown')}</strong>
                             <small class="text-muted ms-2">${tg.sender_id}</small>
-                            ${tg.is_teach_in ? `<span class="badge bg-warning ms-2">${t('teach_in.teach_in_badge', 'Teach-In')}</span>` : ''}
+                            ${tg.is_teach_in ? `<span class="badge bg-warning ms-2">${t('teach_in.teach_in_badge','Teach-In')}</span>` : ''}
                         </div>
                         <div>
                             <span class="badge bg-secondary">${tg.rorg}</span>
                             <small class="text-muted">${tg.dbm ? tg.dbm + ' dBm' : 'N/A'}</small>
                         </div>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('Failed to load recent telegrams:', error);
-            }
+                    </div>`).join('');
+            } catch (error) { console.error('Failed to load recent telegrams:', error); }
         }
 
         async function clearTelegrams() {
             try {
                 await fetch(getApiUrl('/api/gateway/clear-telegrams'), { method: 'POST' });
-                loadRecentTelegrams();
-                loadUnknownDevices();
-                showToast(t('toast.telegrams_cleared', 'Telegrams cleared'), 'success');
-            } catch (error) {
-                showToast(t('toast.telegrams_clear_failed', 'Failed to clear telegrams'), 'danger');
-            }
+                loadRecentTelegrams(); loadUnknownDevices();
+                showToast(t('toast.telegrams_cleared','Telegrams cleared'), 'success');
+            } catch (error) { showToast(t('toast.telegrams_clear_failed','Failed to clear telegrams'), 'danger'); }
         }
 
         async function loadUnknownDevices() {
             try {
                 const response = await fetch(getApiUrl('/api/gateway/unknown-devices'));
                 const devices = await response.json();
-
                 const container = document.getElementById('unknown-devices-list');
-
-                if (devices.length === 0) {
-                    container.innerHTML = `<p class="text-muted">${t('dashboard.no_unknown', 'No unknown devices detected')}</p>`;
-                    return;
-                }
-
-                container.innerHTML = `
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>${t('table.address', 'Address')}</th>
-                                    <th>${t('table.rorg', 'RORG')}</th>
-                                    <th>${t('table.signal', 'Signal')}</th>
-                                    <th>${t('table.count', 'Count')}</th>
-                                    <th>${t('table.last_seen', 'Last Seen')}</th>
-                                    <th>${t('table.action', 'Action')}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${devices.map(d => `
-                                    <tr>
-                                        <td><code>${d.sender_id}</code></td>
-                                        <td><span class="badge bg-primary">${d.rorg}</span></td>
-                                        <td>${d.dbm ? d.dbm + ' dBm' : '<span class="text-muted">N/A</span>'}</td>
-                                        <td>${d.count}</td>
-                                        <td><small>${new Date(d.last_seen).toLocaleTimeString()}</small></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary" onclick="addUnknownDevice('${d.sender_id}', '${d.rorg}')">
-                                                <i class="bi bi-plus"></i> ${t('table.add', 'Add')}
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-            } catch (error) {
-                console.error('Failed to load unknown devices:', error);
-            }
+                if (devices.length === 0) { container.innerHTML = `<p class="text-muted">${t('dashboard.no_unknown','No unknown devices detected')}</p>`; return; }
+                container.innerHTML = `<div class="table-responsive"><table class="table table-sm">
+                    <thead><tr><th>${t('table.address','Address')}</th><th>${t('table.rorg','RORG')}</th><th>${t('table.signal','Signal')}</th><th>${t('table.count','Count')}</th><th>${t('table.last_seen','Last Seen')}</th><th>${t('table.action','Action')}</th></tr></thead>
+                    <tbody>${devices.map(d => `<tr>
+                        <td><code>${d.sender_id}</code></td>
+                        <td><span class="badge bg-primary">${d.rorg}</span></td>
+                        <td>${d.dbm ? d.dbm + ' dBm' : '<span class="text-muted">N/A</span>'}</td>
+                        <td>${d.count}</td>
+                        <td><small>${new Date(d.last_seen).toLocaleTimeString()}</small></td>
+                        <td><button class="btn btn-sm btn-outline-primary" onclick="addUnknownDevice('${d.sender_id}','${d.rorg}')"><i class="bi bi-plus"></i> ${t('table.add','Add')}</button></td>
+                    </tr>`).join('')}</tbody>
+                </table></div>`;
+            } catch (error) { console.error('Failed to load unknown devices:', error); }
         }
 
         function addUnknownDevice(senderId, rorg) {
-            // Navigate to teach-in page and pre-fill the form
-            navigateTo('teach-in');
-            showManualEntry();
+            navigateTo('teach-in'); showManualEntry();
             document.querySelector('[name="address"]').value = senderId;
             document.querySelector('[name="rorg"]').value = rorg;
         }
-
-        // === EEP.xml Upload Management ===
 
         async function loadEepInfo() {
             try {
                 const response = await fetch(getApiUrl('/api/system/eep-info'));
                 const data = await response.json();
-
                 const sourceLabels = {
-                    user: t('settings.eep_source_user', 'Custom (uploaded)'),
-                    bundled: t('settings.eep_source_bundled', 'Bundled (default)'),
-                    minimal: t('settings.eep_source_minimal', 'Minimal (fallback)')
+                    user: t('settings.eep_source_user','Custom (uploaded)'),
+                    bundled: t('settings.eep_source_bundled','Bundled (default)'),
+                    minimal: t('settings.eep_source_minimal','Minimal (fallback)')
                 };
-
                 document.getElementById('eep-source').textContent = sourceLabels[data.source] || data.source;
-
                 const fileSize = data.source === 'user' ? data.user_file_size : data.bundled_file_size;
                 document.getElementById('eep-file-size').textContent = fileSize > 0 ? formatFileSize(fileSize) : '-';
                 document.getElementById('eep-profile-count').textContent = data.profile_count;
-
                 document.getElementById('eep-delete-btn').style.display = data.user_file_exists ? '' : 'none';
-            } catch (error) {
-                console.error('Failed to load EEP info:', error);
-            }
+            } catch (error) { console.error('Failed to load EEP info:', error); }
         }
 
         async function uploadEep(input) {
             if (!input.files.length) return;
-
-            const formData = new FormData();
-            formData.append('file', input.files[0]);
-
+            const formData = new FormData(); formData.append('file', input.files[0]);
             try {
-                const response = await fetch(getApiUrl('/api/system/upload-eep'), {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    showToast(t('settings.eep_upload_failed', 'EEP.xml upload failed') + ': ' + (error.detail || ''), 'danger');
-                    return;
-                }
-
-                showToast(t('settings.eep_upload_success', 'EEP.xml uploaded successfully'), 'success');
-                loadEepInfo();
-                loadStatus();
-                loadProfiles(); // Refresh tree to detect orphaned mappings
-            } catch (error) {
-                showToast(t('settings.eep_upload_failed', 'EEP.xml upload failed'), 'danger');
-            }
-
+                const response = await fetch(getApiUrl('/api/system/upload-eep'), { method: 'POST', body: formData });
+                if (!response.ok) { const error = await response.json(); showToast(t('settings.eep_upload_failed','EEP.xml upload failed') + ': ' + (error.detail || ''), 'danger'); return; }
+                showToast(t('settings.eep_upload_success','EEP.xml uploaded successfully'), 'success');
+                loadEepInfo(); loadStatus(); loadProfiles();
+            } catch (error) { showToast(t('settings.eep_upload_failed','EEP.xml upload failed'), 'danger'); }
             input.value = '';
         }
 
         async function deleteEep() {
-            if (!confirm(t('settings.eep_delete_confirm', 'Delete custom EEP.xml and revert to bundled version?'))) return;
-
+            if (!confirm(t('settings.eep_delete_confirm','Delete custom EEP.xml and revert to bundled version?'))) return;
             try {
-                const response = await fetch(getApiUrl('/api/system/delete-eep'), {
-                    method: 'DELETE'
-                });
-
-                if (!response.ok) {
-                    showToast(t('settings.eep_delete_failed', 'Failed to delete custom EEP.xml'), 'danger');
-                    return;
-                }
-
-                showToast(t('settings.eep_delete_success', 'Custom EEP.xml deleted, reverted to bundled'), 'success');
-                loadEepInfo();
-                loadStatus();
-                loadProfiles(); // Refresh tree to detect orphaned mappings
-            } catch (error) {
-                showToast(t('settings.eep_delete_failed', 'Failed to delete custom EEP.xml'), 'danger');
-            }
+                const response = await fetch(getApiUrl('/api/system/delete-eep'), { method: 'DELETE' });
+                if (!response.ok) { showToast(t('settings.eep_delete_failed','Failed to delete custom EEP.xml'), 'danger'); return; }
+                showToast(t('settings.eep_delete_success','Custom EEP.xml deleted, reverted to bundled'), 'success');
+                loadEepInfo(); loadStatus(); loadProfiles();
+            } catch (error) { showToast(t('settings.eep_delete_failed','Failed to delete custom EEP.xml'), 'danger'); }
         }
 
         function showToast(message, type = 'info') {
@@ -3510,12 +2938,7 @@
             const toast = document.createElement('div');
             toast.className = `toast align-items-center text-white bg-${type} border-0`;
             toast.setAttribute('role', 'alert');
-            toast.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body">${message}</div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            `;
+            toast.innerHTML = `<div class="d-flex"><div class="toast-body">${message}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
             container.appendChild(toast);
             const bsToast = new bootstrap.Toast(toast);
             bsToast.show();
