@@ -13,12 +13,120 @@ import zipfile
 import io
 from datetime import datetime
 from lxml import etree
+from pydantic import BaseModel
 
 router = APIRouter()
 
 # Version should match config.yaml
-VERSION = "1.2.1"
+VERSION = "1.3.0"
 
+# Path to HA addon options file (written by the Supervisor from config.yaml options)
+OPTIONS_FILE = "/data/options.json"
+
+
+# ─────────────────────────────────────────────
+# MQTT config helpers
+# ─────────────────────────────────────────────
+
+def _read_options() -> dict:
+    """Read /data/options.json written by HA Supervisor."""
+    if os.path.exists(OPTIONS_FILE):
+        with open(OPTIONS_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+
+def _write_options(data: dict) -> None:
+    """Persist options back to /data/options.json."""
+    with open(OPTIONS_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
+
+class MQTTConfig(BaseModel):
+    mqtt_host: str
+    mqtt_port: int
+    mqtt_user: str
+    mqtt_pwd: str
+    discovery_prefix: str = "homeassistant"
+    prefix: str = "enoceanmqtt"
+    client_id: str = "enocean_gateway"
+
+
+# ─────────────────────────────────────────────
+# MQTT config endpoints
+# ─────────────────────────────────────────────
+
+@router.get("/mqtt-config")
+async def get_mqtt_config() -> Dict[str, Any]:
+    """Return the current MQTT broker configuration.
+
+    Reads from /data/options.json (HA Supervisor) with fallback to env vars
+    so the UI always shows the live values.
+    """
+    opts = _read_options()
+    mqtt_opts = opts.get("mqtt", {})
+
+    return {
+        "mqtt_host":        mqtt_opts.get("mqtt_host",        os.getenv("MQTT_HOST", "")),
+        "mqtt_port":        mqtt_opts.get("mqtt_port",        int(os.getenv("MQTT_PORT", "1883"))),
+        "mqtt_user":        mqtt_opts.get("mqtt_user",        os.getenv("MQTT_USER", "")),
+        # Never expose the password value – just whether it is set
+        "mqtt_pwd_set":     bool(mqtt_opts.get("mqtt_pwd",    os.getenv("MQTT_PASSWORD", ""))),
+        "discovery_prefix": mqtt_opts.get("discovery_prefix", os.getenv("MQTT_DISCOVERY_PREFIX", "homeassistant")),
+        "prefix":           mqtt_opts.get("prefix",           os.getenv("MQTT_PREFIX", "enoceanmqtt")),
+        "client_id":        mqtt_opts.get("client_id",        os.getenv("MQTT_CLIENT_ID", "enocean_gateway")),
+    }
+
+
+@router.post("/mqtt-config")
+async def save_mqtt_config(config: MQTTConfig, request: Request) -> Dict[str, Any]:
+    """Save MQTT broker configuration and reconnect.
+
+    Writes the new values into /data/options.json under the ``mqtt`` key,
+    then reconnects the live MQTTHandler so changes take effect immediately
+    without restarting the addon.
+    """
+    # 1. Persist to options file
+    opts = _read_options()
+    opts["mqtt"] = {
+        "mqtt_host":        config.mqtt_host,
+        "mqtt_port":        config.mqtt_port,
+        "mqtt_user":        config.mqtt_user,
+        # Keep existing password if the caller sent an empty string
+        # (the UI never sends back the masked value)
+        "mqtt_pwd":         config.mqtt_pwd if config.mqtt_pwd else opts.get("mqtt", {}).get("mqtt_pwd", ""),
+        "discovery_prefix": config.discovery_prefix,
+        "prefix":           config.prefix,
+        "client_id":        config.client_id,
+    }
+    _write_options(opts)
+
+    # 2. Reconnect live MQTT handler with new credentials
+    mqtt_handler = request.app.state.mqtt_handler
+    if mqtt_handler:
+        try:
+            if mqtt_handler.is_connected:
+                await mqtt_handler.disconnect()
+
+            mqtt_handler.host     = config.mqtt_host
+            mqtt_handler.port     = config.mqtt_port
+            mqtt_handler.username = config.mqtt_user
+            mqtt_handler.password = opts["mqtt"]["mqtt_pwd"]
+            mqtt_handler.prefix   = config.prefix
+
+            await mqtt_handler.connect()
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Config saved but reconnect failed: {e}"
+            )
+
+    return {"status": "saved", "reconnected": mqtt_handler is not None}
+
+
+# ─────────────────────────────────────────────
+# Existing endpoints (unchanged)
+# ─────────────────────────────────────────────
 
 @router.get("/status")
 async def get_status(request: Request) -> Dict[str, Any]:
@@ -74,8 +182,6 @@ async def get_config(request: Request) -> Dict[str, Any]:
 @router.get("/logs")
 async def get_logs(lines: int = 100, request: Request = None) -> Dict[str, Any]:
     """Get recent log entries"""
-    # In a real implementation, this would read from a log file
-    # For now, return placeholder
     return {
         "logs": [],
         "message": "Log streaming not yet implemented"
@@ -87,26 +193,21 @@ async def export_all(request: Request):
     """Export all configuration as ZIP file"""
     config_path = request.app.state.config_path
 
-    # Create in-memory ZIP file
     zip_buffer = io.BytesIO()
 
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
-        # Export devices
         devices_file = os.path.join(config_path, "devices.yaml")
         if os.path.exists(devices_file):
             zf.write(devices_file, "devices.yaml")
 
-        # Export legacy devices format
         legacy_devices = os.path.join(config_path, "enoceanmqtt.devices")
         if os.path.exists(legacy_devices):
             zf.write(legacy_devices, "enoceanmqtt.devices")
 
-        # Export mappings
         mappings_file = os.path.join(config_path, "mapping.yaml")
         if os.path.exists(mappings_file):
             zf.write(mappings_file, "mapping.yaml")
 
-        # Export custom EEP profiles
         custom_eep_path = os.path.join(config_path, "custom_eep")
         if os.path.exists(custom_eep_path):
             for filename in os.listdir(custom_eep_path):
@@ -114,17 +215,14 @@ async def export_all(request: Request):
                     filepath = os.path.join(custom_eep_path, filename)
                     zf.write(filepath, f"custom_eep/{filename}")
 
-        # Export user EEP.xml if exists
         user_eep = os.path.join(config_path, "EEP.xml")
         if os.path.exists(user_eep):
             zf.write(user_eep, "EEP.xml")
 
-        # Export mapping overrides
         overrides_file = os.path.join(config_path, "mapping_overrides.yaml")
         if os.path.exists(overrides_file):
             zf.write(overrides_file, "mapping_overrides.yaml")
 
-        # Add export metadata
         metadata = {
             "exported_at": datetime.now().isoformat(),
             "version": VERSION,
@@ -167,7 +265,6 @@ async def import_all(file: UploadFile = File(...), request: Request = None) -> D
         with zipfile.ZipFile(zip_buffer, 'r') as zf:
             for filename in zf.namelist():
                 if filename in ("devices.json", "devices.yaml"):
-                    # Import devices (support both old JSON and new YAML)
                     raw = zf.read(filename)
                     if filename.endswith(".json"):
                         devices_data = json.loads(raw)
@@ -179,12 +276,10 @@ async def import_all(file: UploadFile = File(...), request: Request = None) -> D
                         await f.write(yaml.dump(devices_data, default_flow_style=False, allow_unicode=True))
                     imported["devices"] = True
 
-                    # Reload devices
                     if device_manager:
                         await device_manager.load_devices()
 
                 elif filename == "mapping.yaml":
-                    # Import mappings
                     mappings_data = zf.read(filename)
                     mappings_file = os.path.join(config_path, "mapping.yaml")
                     os.makedirs(config_path, exist_ok=True)
@@ -193,7 +288,6 @@ async def import_all(file: UploadFile = File(...), request: Request = None) -> D
                     imported["mappings"] = True
 
                 elif filename.startswith("custom_eep/") and filename.endswith(".yaml"):
-                    # Import custom profiles
                     profile_data = zf.read(filename)
                     profile_name = os.path.basename(filename)
                     custom_path = os.path.join(config_path, "custom_eep")
@@ -203,7 +297,6 @@ async def import_all(file: UploadFile = File(...), request: Request = None) -> D
                     imported["custom_profiles"] += 1
 
                 elif filename == "EEP.xml":
-                    # Import user EEP.xml
                     eep_data = zf.read(filename)
                     eep_path = os.path.join(config_path, "EEP.xml")
                     os.makedirs(config_path, exist_ok=True)
@@ -212,7 +305,6 @@ async def import_all(file: UploadFile = File(...), request: Request = None) -> D
                     imported["eep_xml"] = True
 
                 elif filename in ("mapping_overrides.json", "mapping_overrides.yaml"):
-                    # Import mapping overrides (support both old JSON and new YAML)
                     raw = zf.read(filename)
                     if filename.endswith(".json"):
                         overrides_data = json.loads(raw)
@@ -224,13 +316,11 @@ async def import_all(file: UploadFile = File(...), request: Request = None) -> D
                         await f.write(yaml.dump(overrides_data, default_flow_style=False, allow_unicode=True))
                     imported["mapping_overrides"] = True
 
-        # Reinitialize EEP manager if any EEP-related data was imported
         eep_manager = request.app.state.eep_manager
         if eep_manager and (imported.get("eep_xml") or imported.get("custom_profiles", 0) > 0):
             eep_manager.profiles.clear()
             await eep_manager.initialize()
 
-        # Reload mapping overrides into cache after import
         if imported.get("mapping_overrides") and eep_manager:
             await eep_manager._load_overrides()
 
@@ -263,23 +353,19 @@ async def upload_eep(file: UploadFile = File(...), request: Request = None) -> D
     try:
         content = await file.read()
 
-        # Validate XML
         try:
             root = etree.fromstring(content)
-            # Basic structure check - should have telegram elements
             telegrams = root.findall(".//telegram")
             if not telegrams:
                 raise HTTPException(status_code=400, detail="Invalid EEP.xml: no telegram elements found")
         except etree.XMLSyntaxError as e:
             raise HTTPException(status_code=400, detail=f"Invalid XML: {e}")
 
-        # Save to config path
         eep_path = os.path.join(config_path, "EEP.xml")
         os.makedirs(config_path, exist_ok=True)
         async with aiofiles.open(eep_path, 'wb') as f:
             await f.write(content)
 
-        # Reload EEP profiles
         if eep_manager:
             eep_manager.profiles.clear()
             await eep_manager.initialize()
@@ -309,7 +395,6 @@ async def delete_eep(request: Request) -> Dict[str, Any]:
     try:
         os.remove(eep_path)
 
-        # Reload EEP profiles (will fall back to bundled)
         if eep_manager:
             eep_manager.profiles.clear()
             await eep_manager.initialize()
@@ -326,7 +411,6 @@ BACKUP_DIR = "backups"
 
 
 def _get_backup_dir(config_path: str) -> str:
-    """Get backup directory path, creating it if needed"""
     backup_dir = os.path.join(config_path, BACKUP_DIR)
     os.makedirs(backup_dir, exist_ok=True)
     return backup_dir
@@ -345,7 +429,6 @@ async def list_backups(request: Request):
         filepath = os.path.join(backup_dir, filename)
         stat = os.stat(filepath)
 
-        # Try to read metadata from ZIP
         devices = 0
         version = "?"
         try:
@@ -386,39 +469,32 @@ async def create_backup(request: Request) -> Dict[str, Any]:
     eep_manager = request.app.state.eep_manager
 
     with zipfile.ZipFile(filepath, 'w', zipfile.ZIP_DEFLATED) as zf:
-        # Devices
         devices_file = os.path.join(config_path, "devices.yaml")
         if os.path.exists(devices_file):
             zf.write(devices_file, "devices.yaml")
 
-        # Legacy devices
         legacy_devices = os.path.join(config_path, "enoceanmqtt.devices")
         if os.path.exists(legacy_devices):
             zf.write(legacy_devices, "enoceanmqtt.devices")
 
-        # Mappings
         mappings_file = os.path.join(config_path, "mapping.yaml")
         if os.path.exists(mappings_file):
             zf.write(mappings_file, "mapping.yaml")
 
-        # Custom EEP profiles
         custom_eep_path = os.path.join(config_path, "custom_eep")
         if os.path.exists(custom_eep_path):
             for fname in os.listdir(custom_eep_path):
                 if fname.endswith(".yaml"):
                     zf.write(os.path.join(custom_eep_path, fname), f"custom_eep/{fname}")
 
-        # User EEP.xml
         user_eep = os.path.join(config_path, "EEP.xml")
         if os.path.exists(user_eep):
             zf.write(user_eep, "EEP.xml")
 
-        # Mapping overrides
         overrides_file = os.path.join(config_path, "mapping_overrides.yaml")
         if os.path.exists(overrides_file):
             zf.write(overrides_file, "mapping_overrides.yaml")
 
-        # Metadata
         metadata = {
             "exported_at": datetime.now().isoformat(),
             "version": VERSION,
@@ -466,7 +542,6 @@ async def restore_backup(filename: str, request: Request) -> Dict[str, Any]:
         with zipfile.ZipFile(filepath, 'r') as zf:
             for name in zf.namelist():
                 if name in ("devices.json", "devices.yaml"):
-                    # Restore devices (support both old JSON and new YAML backups)
                     raw = zf.read(name)
                     if name.endswith(".json"):
                         devices_data = json.loads(raw)
@@ -500,7 +575,6 @@ async def restore_backup(filename: str, request: Request) -> Dict[str, Any]:
                     imported["eep_xml"] = True
 
                 elif name in ("mapping_overrides.json", "mapping_overrides.yaml"):
-                    # Restore overrides (support both old JSON and new YAML backups)
                     raw = zf.read(name)
                     if name.endswith(".json"):
                         overrides_data = json.loads(raw)
@@ -511,12 +585,10 @@ async def restore_backup(filename: str, request: Request) -> Dict[str, Any]:
                         await f.write(yaml.dump(overrides_data, default_flow_style=False, allow_unicode=True))
                     imported["mapping_overrides"] = True
 
-        # Reinitialize EEP manager if any EEP-related data was restored
         if eep_manager and (imported.get("eep_xml") or imported.get("custom_profiles", 0) > 0):
             eep_manager.profiles.clear()
             await eep_manager.initialize()
 
-        # Reload mapping overrides into cache after restore
         if imported.get("mapping_overrides") and eep_manager:
             await eep_manager._load_overrides()
 
@@ -548,14 +620,12 @@ async def restart_services(request: Request) -> Dict[str, str]:
     serial_handler = request.app.state.serial_handler
 
     try:
-        # Disconnect
         if serial_handler and serial_handler.is_connected:
             await serial_handler.disconnect()
 
         if mqtt_handler and mqtt_handler.is_connected:
             await mqtt_handler.disconnect()
 
-        # Reconnect
         if mqtt_handler:
             await mqtt_handler.connect()
 
