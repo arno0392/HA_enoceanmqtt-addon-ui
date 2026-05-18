@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.0] - 2026-05-18
+
+### Improvements
+- **external MQTT** — now available, you can subscrive to an external MQTT with the associated credentials.
+
 ## [1.2.5] - 2026-04-17
 
 ### Improvements
