@@ -36,6 +36,14 @@ def _read_options() -> dict:
     return {}
 
 
+def _safe_int(value, default: int) -> int:
+    """Convert value to int safely, returning default on failure."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def _write_options(data: dict) -> None:
     """Persist options back to /data/options.json."""
     with open(OPTIONS_FILE, "w") as f:
@@ -68,7 +76,7 @@ async def get_mqtt_config() -> Dict[str, Any]:
 
     return {
         "mqtt_host":        mqtt_opts.get("mqtt_host",        os.getenv("MQTT_HOST", "")),
-        "mqtt_port":        mqtt_opts.get("mqtt_port",        int(os.getenv("MQTT_PORT", "1883"))),
+        "mqtt_port":        _safe_int(mqtt_opts.get("mqtt_port", os.getenv("MQTT_PORT", "")), 1883),
         "mqtt_user":        mqtt_opts.get("mqtt_user",        os.getenv("MQTT_USER", "")),
         # Never expose the password value – just whether it is set
         "mqtt_pwd_set":     bool(mqtt_opts.get("mqtt_pwd",    os.getenv("MQTT_PASSWORD", ""))),
