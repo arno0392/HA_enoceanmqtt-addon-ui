@@ -51,6 +51,14 @@ VERSION = "1.3.0"
 OPTIONS_FILE = "/data/options.json"
 
 
+def _safe_int(value, default: int) -> int:
+    """Convert value to int safely, returning default on any failure."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def _load_mqtt_config() -> dict:
     """Load MQTT configuration.
 
@@ -73,7 +81,7 @@ def _load_mqtt_config() -> dict:
 
     return {
         "host":             opts.get("mqtt_host",        os.getenv("MQTT_HOST", "")),
-        "port":             int(opts.get("mqtt_port",    os.getenv("MQTT_PORT", "1883"))),
+        "port":             _safe_int(opts.get("mqtt_port", os.getenv("MQTT_PORT", "")), 1883),
         "user":             opts.get("mqtt_user",        os.getenv("MQTT_USER", "")),
         "password":         opts.get("mqtt_pwd",         os.getenv("MQTT_PASSWORD", "")),
         "prefix":           opts.get("prefix",           os.getenv("MQTT_PREFIX", "enoceanmqtt")),
