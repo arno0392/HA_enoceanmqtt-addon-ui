@@ -1,9 +1,9 @@
 # EnOcean MQTT UI - All-in-One Home Assistant Add-on
 
-[![Add to Home Assistant](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https://github.com/ESDN83/HA_enoceanmqtt-addon-ui)
+[![Add to Home Assistant](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https://github.com/arno0392/HA_enoceanmqtt-addon-ui/edit/main/README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Add--on-41BDF5.svg)](https://www.home-assistant.io/)
-[![GitHub Release](https://img.shields.io/github/v/release/ESDN83/HA_enoceanmqtt-addon-ui)](https://github.com/ESDN83/HA_enoceanmqtt-addon-ui/releases)
+[![GitHub Release](https://github.com/arno0392/HA_enoceanmqtt-addon-ui/)](https://github.com/arno0392/HA_enoceanmqtt-addon-ui/releases)
 [![EnOcean](https://img.shields.io/badge/EnOcean-MQTT%20Bridge-green.svg)](https://www.enocean.com/)
 
 Modern web-based EnOcean to MQTT bridge for Home Assistant with visual device configuration.
@@ -36,13 +36,14 @@ Modern web-based EnOcean to MQTT bridge for Home Assistant with visual device co
 
 1. Click the button above or add this repository URL to your Home Assistant Add-on Store:
    ```
-   https://github.com/ESDN83/HA_enoceanmqtt-addon-ui
+   https://github.com/arno0392/HA_enoceanmqtt-addon-ui/
    ```
 
-2. Install the "EnOcean MQTT UI" add-on
+2. Install the "Fork EnOcean MQTT UI" add-on
 
 3. Configure the add-on:
    - **Serial Port**: Select your EnOcean USB transceiver (e.g., `/dev/ttyUSB0` or TCP: `tcp:192.168.1.100:9637`)
+   - **MQTT**: Configure your MQTT server
 
 4. Start the add-on and open the Web UI via the sidebar
 
@@ -64,6 +65,10 @@ Modern web-based EnOcean to MQTT bridge for Home Assistant with visual device co
 | `serial_port` | Serial port of EnOcean USB transceiver (e.g., `/dev/ttyUSB0` or `tcp:host:port`) |
 | `log_level` | Logging level (debug, info, warning, error) |
 | `cache_device_states` | Persist device states across restarts (default: true) |
+| `mqtt.mqtt_host` | MQTT server (default: `core-mosquitto`, e.g. homeassistant integrated) |
+| `mqtt.mqtt_port` | MQTT port (default: `1883`) |
+| `mqtt.mqtt_user` | MQTT user (leave blank if `core-mosquitto` |
+| `mqtt.mqtt_pwd` | MQTT password (leave blank if `core-mosquitto` |
 | `mqtt.discovery_prefix` | Home Assistant MQTT discovery prefix (default: `homeassistant`) |
 | `mqtt.prefix` | MQTT topic prefix for EnOcean devices (default: `enoceanmqtt`) |
 | `mqtt.client_id` | MQTT client identifier |
@@ -485,11 +490,12 @@ docker build --build-arg BUILD_FROM=ghcr.io/home-assistant/amd64-base-python:3.1
 
 ## Support
 
-- Report issues on [GitHub Issues](https://github.com/ESDN83/HA_enoceanmqtt-addon-ui/issues)
+- Report issues on [GitHub Issues](https://github.com/arno0392/HA_enoceanmqtt-addon-ui/issues)
 - Check logs in Home Assistant: Settings > Add-ons > EnOcean MQTT UI > Log
 
 ## Credits
 
+- [ESDN83](https://github.com/ESDN83/HA_enoceanmqtt-addon-ui) - Creator of 99% of this version
 - [ChristopheHD](https://github.com/ChristopheHD/enocean) — EEP.xml profile database and MQTT compatibility patterns
 - EnOcean Alliance for the EEP specification
 - Home Assistant community
