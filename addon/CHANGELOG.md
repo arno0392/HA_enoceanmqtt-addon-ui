@@ -1,14 +1,11 @@
 # Changelog
 
-## [1.3.2] - 2026-05-19
+## [1.3.3] - 2026-05-19
 
 ### Improvements
-- **external MQTT** — bug fixes.
-
-## [1.3.1] - 2026-05-18
-
-### Improvements
-- **external MQTT** — bug fixes.
+- **external MQTT** Bug fixes.
+- **personal EEP Profile** Fix EEP settings profile.
+- Fix translations.
 
 ## [1.3.0] - 2026-05-18
 
