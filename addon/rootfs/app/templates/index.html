@@ -497,7 +497,7 @@
         <div id="page-devices" class="page-content" style="display: none;">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 data-i18n="devices.title">Devices</h2>
-                <button class="btn btn-primary" onclick="navigateTo('teach-in')">
+                <button class="btn btn-primary" onclick="navigateTo('teach-in')" data-i18n="devices.add">
                     <i class="bi bi-plus-circle"></i> Add Device
                 </button>
             </div>
@@ -515,7 +515,7 @@
         <div id="page-profiles" class="page-content" style="display: none;">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 data-i18n="profiles.title">EEP Profiles</h2>
-                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#customProfileModal">
+                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#customProfileModal" data-i18n="profiles.create">
                     <i class="bi bi-plus-circle"></i> Create Custom Profile
                 </button>
             </div>
@@ -1793,7 +1793,8 @@
                         addInlineMappingRow(shortcut, config.component || 'sensor', config.name || '', config.device_class || '', config.icon || '', config.unit_of_measurement || '', {
                             state_class: config.state_class, entity_category: config.entity_category,
                             expire_after: config.expire_after, force_update: config.force_update,
-                            suggested_display_precision: config.suggested_display_precision, value_template: config.value_template
+                            suggested_display_precision: config.suggested_display_precision, value_template: config.value_template,
+                            payload_on: config.payload_on, payload_off: config.payload_off
                         });
                     }
                 } else {
@@ -1864,7 +1865,8 @@
                                 addInlineMappingRow(shortcut, config.component || 'sensor', config.name || '', config.device_class || '', config.icon || '', config.unit_of_measurement || '', {
                                     state_class: config.state_class, entity_category: config.entity_category,
                                     expire_after: config.expire_after, force_update: config.force_update,
-                                    suggested_display_precision: config.suggested_display_precision, value_template: config.value_template
+                                    suggested_display_precision: config.suggested_display_precision, value_template: config.value_template,
+                                    payload_on: config.payload_on, payload_off: config.payload_off
                                 });
                             }
                             document.getElementById('inline-mapping-empty').style.display = 'none';
@@ -1955,7 +1957,9 @@
                   expireAfter = opts.expire_after != null ? opts.expire_after : '',
                   forceUpdate = opts.force_update || false,
                   precision = opts.suggested_display_precision != null ? opts.suggested_display_precision : '',
-                  valueTemplate = opts.value_template || '';
+                  valueTemplate = opts.value_template || '',
+                  payloadOn = opts.payload_on != null ? opts.payload_on : '',
+                  payloadOff = opts.payload_off != null ? opts.payload_off : '';
             const row = document.createElement('div');
             row.className = 'inline-mapping-row border rounded p-2 mb-2 bg-body-secondary';
             row.innerHTML = `
@@ -2015,6 +2019,12 @@
                             <div class="col-md-6"><label class="form-label small">${t('mapping_editor.field_value_template','Value Template')}</label>
                                 <input type="text" class="form-control form-control-sm font-monospace" placeholder="auto-generated" value="${valueTemplate.replace(/"/g,'&quot;')}" data-field="value_template"></div>
                         </div>
+                        <div class="row g-2 mt-1">
+                            <div class="col-md-3"><label class="form-label small">Payload ON <small class="text-muted">(binary_sensor)</small></label>
+                                <input type="text" class="form-control form-control-sm font-monospace" placeholder="e.g. 1" value="${payloadOn}" data-field="payload_on"></div>
+                            <div class="col-md-3"><label class="form-label small">Payload OFF <small class="text-muted">(binary_sensor)</small></label>
+                                <input type="text" class="form-control form-control-sm font-monospace" placeholder="e.g. 0" value="${payloadOff}" data-field="payload_off"></div>
+                        </div>
                     </div>
                 </div>`;
             const collapseEl = row.querySelector('.collapse');
@@ -2051,6 +2061,8 @@
                 const precisionStr = row.querySelector('[data-field="suggested_display_precision"]')?.value || ''; if (precisionStr !== '') entry.suggested_display_precision = parseInt(precisionStr);
                 const forceUpdate = row.querySelector('[data-field="force_update"]')?.checked || false; if (forceUpdate) entry.force_update = true;
                 const valTpl = row.querySelector('[data-field="value_template"]')?.value?.trim() || ''; if (valTpl) entry.value_template = valTpl;
+                const payloadOn = row.querySelector('[data-field="payload_on"]')?.value?.trim() ?? ''; if (payloadOn !== '') entry.payload_on = payloadOn;
+                const payloadOff = row.querySelector('[data-field="payload_off"]')?.value?.trim() ?? ''; if (payloadOff !== '') entry.payload_off = payloadOff;
                 mapping[shortcut] = entry;
             });
             if (!valid) return undefined;
@@ -2652,7 +2664,9 @@
                   expireAfter = opts.expire_after != null ? opts.expire_after : '',
                   forceUpdate = opts.force_update || false,
                   precision = opts.suggested_display_precision != null ? opts.suggested_display_precision : '',
-                  valueTemplate = opts.value_template || '';
+                  valueTemplate = opts.value_template || '',
+                  payloadOn = opts.payload_on != null ? opts.payload_on : '',
+                  payloadOff = opts.payload_off != null ? opts.payload_off : '';
             const row = document.createElement('div');
             row.className = 'ha-mapping-row border rounded p-2 mb-2';
             row.innerHTML = `
@@ -2712,6 +2726,12 @@
                             <div class="col-md-6"><label class="form-label small">${t('mapping_editor.field_value_template','Value Template')}</label>
                                 <input type="text" class="form-control form-control-sm font-monospace" placeholder="auto-generated" value="${valueTemplate.replace(/"/g,'&quot;')}" data-field="value_template"></div>
                         </div>
+                        <div class="row g-2 mt-1">
+                            <div class="col-md-3"><label class="form-label small">Payload ON <small class="text-muted">(binary_sensor)</small></label>
+                                <input type="text" class="form-control form-control-sm font-monospace" placeholder="e.g. 1" value="${payloadOn}" data-field="payload_on"></div>
+                            <div class="col-md-3"><label class="form-label small">Payload OFF <small class="text-muted">(binary_sensor)</small></label>
+                                <input type="text" class="form-control form-control-sm font-monospace" placeholder="e.g. 0" value="${payloadOff}" data-field="payload_off"></div>
+                        </div>
                     </div>
                 </div>`;
             const collapseEl = row.querySelector('.collapse');
@@ -2758,6 +2778,8 @@
                 const precisionStr = row.querySelector('[data-field="suggested_display_precision"]')?.value || ''; if (precisionStr !== '') entry.suggested_display_precision = parseInt(precisionStr);
                 const forceUpdate = row.querySelector('[data-field="force_update"]')?.checked || false; if (forceUpdate) entry.force_update = true;
                 const valTpl = row.querySelector('[data-field="value_template"]')?.value?.trim() || ''; if (valTpl) entry.value_template = valTpl;
+                const payloadOn = row.querySelector('[data-field="payload_on"]')?.value?.trim() ?? ''; if (payloadOn !== '') entry.payload_on = payloadOn;
+                const payloadOff = row.querySelector('[data-field="payload_off"]')?.value?.trim() ?? ''; if (payloadOff !== '') entry.payload_off = payloadOff;
                 mapping[shortcut] = entry;
             });
             if (!valid) return undefined;
@@ -2773,7 +2795,8 @@
                 addHaMappingRow(shortcut, config.component || 'binary_sensor', config.name || '', config.device_class || '', config.icon || '', config.unit_of_measurement || '', {
                     state_class: config.state_class, entity_category: config.entity_category,
                     expire_after: config.expire_after, force_update: config.force_update,
-                    suggested_display_precision: config.suggested_display_precision, value_template: config.value_template
+                    suggested_display_precision: config.suggested_display_precision, value_template: config.value_template,
+                    payload_on: config.payload_on, payload_off: config.payload_off
                 });
             }
         }
