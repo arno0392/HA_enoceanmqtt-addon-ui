@@ -45,7 +45,7 @@ logger = logging.getLogger(__name__)
 CONFIG_PATH = os.getenv("CONFIG_PATH", "/data")
 ENOCEAN_PORT = os.getenv("ENOCEAN_PORT", "")
 CACHE_DEVICE_STATES = os.getenv("CACHE_DEVICE_STATES", "true").lower() == "true"
-VERSION = "1.3.3"
+VERSION = "1.3.4"
 
 # Path to HA Supervisor options file
 OPTIONS_FILE = "/data/options.json"
