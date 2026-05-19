@@ -391,10 +391,13 @@ class MappingManager:
                     if key not in _INTERNAL_KEYS and key not in config:
                         config[key] = value
 
-                # Binary sensor: HA expects "ON"/"OFF" by default, but EEP values are 0/1
+                # Binary sensor: HA expects "ON"/"OFF" by default, but EEP values are 0/1.
+                # Only set defaults if not already defined in the mapping override.
                 if component == "binary_sensor":
-                    config["payload_on"] = "1"
-                    config["payload_off"] = "0"
+                    if "payload_on" not in config:
+                        config["payload_on"] = "1"
+                    if "payload_off" not in config:
+                        config["payload_off"] = "0"
 
                 # Add device info
                 config["device"] = device_info
