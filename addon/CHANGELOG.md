@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.4] - 2026-05-19
+
+### Bug fixes
+- permit eep binary_sensor fixes in `mapping_manager`.
+
 ## [1.3.3] - 2026-05-19
 
 ### Improvements
