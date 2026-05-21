@@ -121,10 +121,14 @@ When both serial and TCP are configured, **TCP takes priority**.
 
 ### MQTT Settings
 
-The add-on automatically connects to Home Assistant's MQTT broker (Mosquitto).
+The add-on automatically connects to Home Assistant's MQTT broker (Mosquitto) or you can select your own mqtt broker.
 
 | Option | Default | Description |
 |--------|---------|-------------|
+| **Host** | `core-mosquitto` | MQTT host, default `core-mosquitto` |
+| **Port** | `1883` | Port, default `1883` |
+| **User** | `homeassistant` | Leave blank if integreted Home Assistant |
+| **Password** | `********` | Leave blank if integreted Home Assistant |
 | **Discovery Prefix** | `homeassistant` | MQTT discovery prefix for HA auto-detection |
 | **Topic Prefix** | `enoceanmqtt` | Topics are created as `enoceanmqtt/{device}/state` |
 | **Client ID** | `enocean_gateway` | Unique MQTT client identifier |
