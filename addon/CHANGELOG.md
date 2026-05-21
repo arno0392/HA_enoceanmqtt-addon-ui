@@ -1,4 +1,21 @@
 # Changelog
+## [1.4.0] - 2026-05-21
+
+### Bug fixes ###
+For **D2-01-12 specifically**, the value_template uses IO to route values to the correct channel — to be confirmed once you have the channel 1 payload.
+
+### Improvements ###
+**Home Assistant Profiles:** The profile file `mapping_manager` has been expanded from 8 to 71 profiles. Here’s what was added:
+
+- **Temperature** — Full A5-02 family (01→30), A5-04-02/03
+- **Presence / Light** — A5-06-01, A5-07-02/03, A5-08-01/02/03
+- **Air Quality** — A5-09-02 (CO₂ + temperature), A5-09-04 (CO₂ + temperature + humidity), A5-09-05 (VOC)
+- **Meters** — A5-12-01 (electricity), A5-12-02 (gas), A5-12-03 (water)
+- **HVAC** — A5-10-01/06 (thermostat)
+- **Advanced Sensors** — A5-14-01/05/09/0A (vibration, window, illuminance)
+- **Switches** (D2-01) — Full 01→0E, 0F (existing), 11 (2-channel dimmer), 12 (2-channel switch), with value_template filtering on IO to distinguish channels
+- **Shutters** — D2-05-01
+- **RPS** — F6-02-02, F6-03-01/02, F6-10-00 (window handle)
 
 ## [1.3.4] - 2026-05-19
 
