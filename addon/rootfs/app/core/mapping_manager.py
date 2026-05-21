@@ -415,14 +415,16 @@ DEFAULT_MAPPINGS = {
             "name": "Channel 0",
             "device_class": "light",
             "payload_on": "100",
-            "payload_off": "0"
+            "payload_off": "0",
+            "value_template": "{{ value_json.OV | string }}"
         },
         "OV_CH1": {
             "component": "binary_sensor",
             "name": "Channel 1",
             "device_class": "light",
             "payload_on": "100",
-            "payload_off": "0"
+            "payload_off": "0",
+            "value_template": "{{ value_json.OV_CH1 | string }}"
         }
     },
 
@@ -432,13 +434,15 @@ DEFAULT_MAPPINGS = {
             "component": "sensor",
             "name": "Channel 0 Brightness",
             "unit_of_measurement": "%",
-            "icon": "mdi:brightness-6"
+            "icon": "mdi:brightness-6",
+            "value_template": "{{ value_json.OV | string }}"
         },
         "OV_CH1": {
             "component": "sensor",
             "name": "Channel 1 Brightness",
             "unit_of_measurement": "%",
-            "icon": "mdi:brightness-6"
+            "icon": "mdi:brightness-6",
+            "value_template": "{{ value_json.OV_CH1 | string }}"
         }
     },
 
