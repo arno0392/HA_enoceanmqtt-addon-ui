@@ -18,7 +18,7 @@ from pydantic import BaseModel
 router = APIRouter()
 
 # Version should match config.yaml
-VERSION = "1.3.4"
+VERSION = "1.4.0"
 
 # Path to HA addon options file (written by the Supervisor from config.yaml options)
 OPTIONS_FILE = "/data/options.json"
