@@ -1,5 +1,5 @@
 # Changelog
-## [1.4.0] - 2026-05-21
+## [1.4.1] - 2026-05-21
 
 ### Bug fixes ###
 For **D2-01-12 specifically**, the value_template uses IO to route values to the correct channel — to be confirmed once you have the channel 1 payload.
