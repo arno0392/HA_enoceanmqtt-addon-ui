@@ -405,43 +405,40 @@ DEFAULT_MAPPINGS = {
     },
 
     # D2-01-12: 2-channel switching actuator
-    # IO=0 -> channel 0, IO=1 -> channel 1. Both channels use the same state topic.
-    # value_template returns the OV value only for the matching channel,
-    # and falls back to the current entity state otherwise (preserves last known state).
+    # The MQTT handler merges both channels into every published payload:
+    #   OV      = channel 0 output value (0 or 100)
+    #   OV_CH1  = channel 1 output value (0 or 100)
+    # No conditional template needed — each field is always present.
     "D2-01-12": {
         "OV": {
             "component": "binary_sensor",
             "name": "Channel 0",
             "device_class": "light",
             "payload_on": "100",
-            "payload_off": "0",
-            "value_template": "{{ value_json.OV if value_json.IO == 0 else none }}"
+            "payload_off": "0"
         },
         "OV_CH1": {
             "component": "binary_sensor",
             "name": "Channel 1",
             "device_class": "light",
             "payload_on": "100",
-            "payload_off": "0",
-            "value_template": "{{ value_json.OV if value_json.IO == 1 else none }}"
+            "payload_off": "0"
         }
     },
 
-    # D2-01-11: 2-channel dimmer
+    # D2-01-11: 2-channel dimmer (same merge strategy as D2-01-12)
     "D2-01-11": {
         "OV": {
             "component": "sensor",
             "name": "Channel 0 Brightness",
             "unit_of_measurement": "%",
-            "icon": "mdi:brightness-6",
-            "value_template": "{{ value_json.OV if value_json.IO == 0 else none }}"
+            "icon": "mdi:brightness-6"
         },
         "OV_CH1": {
             "component": "sensor",
             "name": "Channel 1 Brightness",
             "unit_of_measurement": "%",
-            "icon": "mdi:brightness-6",
-            "value_template": "{{ value_json.OV if value_json.IO == 1 else none }}"
+            "icon": "mdi:brightness-6"
         }
     },
 
