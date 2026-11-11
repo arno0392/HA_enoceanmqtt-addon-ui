@@ -11,6 +11,18 @@
   after the module is powered up, or with a security code. Experimental.
   ADR-0049.
 
+## [1.8.7-beta5] - 2026-11-11 (beta channel)
+
+### Added
+
+- **Add the missing channel of a two-channel module.** When only one channel
+  of a D2-01-11 or D2-01-12 module is configured, the device list and the
+  device page offer *Add channel 1/2*. It copies the device with the other
+  channel and the name plus " CH1" or " CH2", cut to 64 characters if
+  needed. The description is not copied: it names the channel's entity in
+  Home Assistant. ADR-0048, PR #69 by arno0392.
+- **French translation complete.** PR #68 by arno0392.
+
 ## [1.8.7-beta4] - 2026-11-10 (beta channel)
 
 ### Fixed
