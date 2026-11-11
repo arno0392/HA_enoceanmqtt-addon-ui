@@ -1045,8 +1045,8 @@ async function loadHaAreas() {
 function _repeaterText(r) {
     if (!r) return '';
     const state = r.function === 'off' ? t('repeater.state_off', 'off')
-        : r.function === 'on' ? t('repeater.state_level', 'level {n}').replace('{n}', r.level)
-        : r.function === 'filtered' ? t('repeater.state_filtered', 'filtered, level {n}').replace('{n}', r.level)
+        : r.function === 'on' ? t('repeater.state_level', 'level {n}').replace('{n}', () => r.level)
+        : r.function === 'filtered' ? t('repeater.state_filtered', 'filtered, level {n}').replace('{n}', () => r.level)
         : r.function;
     return `${state} (${r.raw})`;
 }
@@ -1066,10 +1066,10 @@ async function recomRepeater(name, mode) {
         });
         const data = await resp.json().catch(() => ({}));
         if (!resp.ok) throw new Error(apiErrorText(data.detail, resp.statusText));
-        let text = t('repeater.current', 'Repeater: {state}').replace('{state}', _repeaterText(data.after || data.before));
+        let text = t('repeater.current', 'Repeater: {state}').replace('{state}', () => _repeaterText(data.after || data.before));
         if (data.after) {
             text = t('repeater.changed', 'Repeater: {before} → {after}')
-                .replace('{before}', _repeaterText(data.before)).replace('{after}', _repeaterText(data.after));
+                .replace('{before}', () => _repeaterText(data.before)).replace('{after}', () => _repeaterText(data.after));
             if (!data.applied) {
                 text += '. ' + t('repeater.not_applied', 'The module did not keep the requested value.');
                 out.className = 'small mt-2 text-warning';
